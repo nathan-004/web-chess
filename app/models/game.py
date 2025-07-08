@@ -137,6 +137,8 @@ class ChessBoard:
                     print(piece.symbol if piece is not None else " ", end=" |")
                 else:
                     print("#", end=" |")
+        
+        print("")
 
 if __name__ == "__main__":
     game = ChessBoard()
