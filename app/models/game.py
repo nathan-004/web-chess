@@ -4,6 +4,10 @@ from typing import Optional
 WHITE = "white"
 BLACK = "black"
 
+def blank_board() -> list[list]:
+    """Retourne un échiquier vide"""
+    return [[None for _ in range(8)] for _ in range(8)]
+
 def start_board() -> list[list]:
     """Retourne la configuration de départ"""
     board = [[None for _ in range(8)] for _ in range(8)]
@@ -12,7 +16,7 @@ def start_board() -> list[list]:
     board[1] = [Pawn(BLACK) for _ in range(8)]
 
     board[-1] = [Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE), King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)]
-    board[-2] = [Pawn(BLACK) for _ in range(8)]
+    board[-2] = [Pawn(WHITE) for _ in range(8)]
 
     return board
 
@@ -21,6 +25,9 @@ class Piece:
         self.color = color
         self.symbol = " "
         self.moves = []
+
+    def get_moves(self, posX, posY, board) -> list:
+        return []
 
 class King(Piece):
     def __init__(self, color):
@@ -41,7 +48,7 @@ class King(Piece):
             for incr_x in range(-1,2,1):
                 if incr_y == 0 and incr_x == 0:
                     continue
-                elif 8 >= posX+incr_x < 0 or 8 >= posY+incr_y < 0:
+                elif not (0 <= posX+incr_x < 8) or not (0 <= posY+incr_y < 8):
                     continue
                 else:
                     new_x, new_y = posX + incr_x, posY + incr_y
@@ -55,6 +62,7 @@ class King(Piece):
                     if cur_color != board[new_y][new_x].color:
                         moves.append((new_x, new_y))
 
+        return moves
 
 class Queen(Piece):
     def __init__(self, color):
@@ -84,8 +92,11 @@ class Pawn(Piece):
 class ChessBoard:
     """Contient les positions des pièces"""
 
-    def __init__(self, board:Optional[list] = start_board()):
-        self.board = board
+    def __init__(self, board:Optional[list] = None):
+        if board is None:
+            self.board = start_board()
+        else:
+            self.board = board
 
     def display(self, board:Optional[list] = None) -> None:
         """
@@ -105,7 +116,29 @@ class ChessBoard:
             print("")
             for x, piece in enumerate(row):
                 print(piece.symbol if piece is not None else " ", end=" |")
+        
+        print("")
+
+    def display_move(self, x, y, board:Optional[list] = None) -> None:
+        """Affiche l'échiquier et les coups possibles pour la pièce à la position (x,y)"""
+        if board is None:
+            board = self.board # Passage par récurrence, pas de modifications
+        
+        assert 8 > x >= 0, "La position X donnée n'est pas valide"
+        assert 8 > y >= 0, "La position Y donnée n'est pas valide"
+
+        moves = board[y][x].get_moves(x, y, board)
+
+        for y, row in enumerate(board):
+            # print(f"\n{'-' * 24}")
+            print("")
+            for x, piece in enumerate(row):
+                if (x,y) not in moves:
+                    print(piece.symbol if piece is not None else " ", end=" |")
+                else:
+                    print("#", end=" |")
 
 if __name__ == "__main__":
     game = ChessBoard()
     game.display()
+    game.display_move(4, 7)
