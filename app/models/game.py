@@ -84,7 +84,7 @@ class Knight(Piece):
         super().__init__(color)
         self.symbol = '\u2658' if color != WHITE else '\u265E'
 
-    def get_moves(self, posX, posY, board):
+    def get_moves(self, posX, posY, board) -> list[tuple[int]]:
         """        
         Retourne les mouvements possibles de cette pièce sous forme de liste de tuples (x,y)
         ! Ne regarde pas si le coup met en échec !
@@ -101,7 +101,6 @@ class Knight(Piece):
                 if not (0 <= new_pos[0] < 8) or not (0 <= new_pos[1] < 8):
                     continue
                 
-                print(new_pos)
                 if board[new_pos[1]][new_pos[0]] is None:
                     moves.append(new_pos)
                 elif board[new_pos[1]][new_pos[0]].color != board[posY][posX].color:
@@ -144,7 +143,7 @@ class ChessBoard:
         
         print("")
 
-    def display_move(self, x, y, board:Optional[list] = None) -> None:
+    def display_moves(self, x, y, board:Optional[list] = None) -> None:
         """Affiche l'échiquier et les coups possibles pour la pièce à la position (x,y)"""
         if board is None:
             board = self.board # Passage par récurrence, pas de modifications
@@ -165,7 +164,61 @@ class ChessBoard:
         
         print("")
 
+    def move(self, start_pos, end_pos, board:Optional[list[list]] = None) -> Optional[list[list]]:
+        """
+        Modifie `self.board` si board n'est pas spécifié, sinon retourne l'échiquier avec le coup fait
+
+        Parameters
+        ----------
+        start_pos:tuple:(x,y)
+        end_pos:tuple:(x,y)
+        board:list: échiquier, si non spécifié, modification de `self.board`
+        """
+        if board is None:
+            board = self.board # Passage par référence pour faire des modifications
+
+        # Vérifier si le coup est possible
+        if self.valid_move(start_pos, end_pos, board):
+            board[start_pos[1]][start_pos[0]], board[end_pos[1]][end_pos[0]] = None, board[start_pos[1]][start_pos[0]]
+        else:
+            return 1
+
+        if not board is self.board:
+            return board
+
+    def valid_move(self, start_pos, end_pos, board:Optional[list]=None):
+        """Vérifie si un coup peut être joué à partir des règles de mouvements dans les classes des pièces"""
+        if not (8 > start_pos[0] >= 0):
+            return False
+        if not (8 > start_pos[1] >= 0):
+            return False
+
+        if not (8 > end_pos[0] >= 0):
+            return False
+        if not (8 > end_pos[1] >= 0):
+            return False
+
+        if board is None:
+            board = self.board # Passage par référence, ne pas faire de modifications
+
+        if board[start_pos[1]][start_pos[0]] is None:
+            return False
+
+        # Vérifier que la pièce tombe sur une pièce vide ou d'une couleur différente
+        if board[end_pos[1]][end_pos[0]] is not None:
+            if board[start_pos[1]][start_pos[0]].color == board[end_pos[1]][end_pos[0]].color:
+                return False
+        
+        moves = board[start_pos[1]][start_pos[0]].get_moves(start_pos[0], start_pos[1], board)
+        if end_pos in moves:
+            return True
+        
+        return False
+
 if __name__ == "__main__":
     game = ChessBoard()
     game.display()
-    game.display_move(1, 7)
+    game.display_moves(1, 7)
+    game.move((1,7), (2,6))
+    game.move((1,7), (2,5))
+    game.display()
