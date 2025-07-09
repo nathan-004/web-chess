@@ -32,7 +32,7 @@ class Piece:
 class King(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2654' if color == WHITE else '\u265A'
+        self.symbol = '\u2654' if color != WHITE else '\u265A'
 
     def get_moves(self, posX, posY, board) -> list[tuple]:
         """
@@ -67,27 +67,52 @@ class King(Piece):
 class Queen(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2655' if color == WHITE else '\u265B'
+        self.symbol = '\u2655' if color != WHITE else '\u265B'
 
 class Rook(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2656' if color == WHITE else '\u265C'
+        self.symbol = '\u2656' if color != WHITE else '\u265C'
 
 class Bishop(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2657' if color == WHITE else '\u265D'
+        self.symbol = '\u2657' if color != WHITE else '\u265D'
 
 class Knight(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2658' if color == WHITE else '\u265E'
+        self.symbol = '\u2658' if color != WHITE else '\u265E'
+
+    def get_moves(self, posX, posY, board):
+        """        
+        Retourne les mouvements possibles de cette pièce sous forme de liste de tuples (x,y)
+        ! Ne regarde pas si le coup met en échec !
+        posX:int:position x de la pièce
+        posY:int:position Y de la pièce
+        board:list # Passage par référence : pas de modifications
+        """
+        moves = []
+
+        for dir in [(-2, 0), (0, 2), (2, 0), (0, -2)]: # Liste des directions possibles (x,y)
+            for move in range(-1, 2, 2):
+                move_x, move_y = move if dir[0] == 0 else 0, move if dir[1] == 0 else 0 # Regarde sur quel axe regarder des deux côtés
+                new_pos = (posX + dir[0] + move_x, posY + dir[1] + move_y)
+                if not (0 <= new_pos[0] < 8) or not (0 <= new_pos[1] < 8):
+                    continue
+                
+                print(new_pos)
+                if board[new_pos[1]][new_pos[0]] is None:
+                    moves.append(new_pos)
+                elif board[new_pos[1]][new_pos[0]].color != board[posY][posX].color:
+                    moves.append(new_pos)
+        
+        return moves
 
 class Pawn(Piece):
     def __init__(self, color):
         super().__init__(color)
-        self.symbol = '\u2659' if color == WHITE else '\u265F'
+        self.symbol = '\u2659' if color != WHITE else '\u265F'
 
 class ChessBoard:
     """Contient les positions des pièces"""
@@ -143,4 +168,4 @@ class ChessBoard:
 if __name__ == "__main__":
     game = ChessBoard()
     game.display()
-    game.display_move(4, 7)
+    game.display_move(1, 7)
