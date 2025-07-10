@@ -33,8 +33,18 @@ class Piece:
     def get_moves(self, pos: Position, board) -> list:
         return []
     
-    def is_valid_pos(self, initial_pos: Position):
-        pass
+    def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]):
+        if not (0 <= new_pos.x < 8) or not (0 <= new_pos.y < 8): # Regarde si pièce sort du terrain 
+            return False
+        if initial_pos.x == new_pos.x and initial_pos.y == new_pos.y:
+            return False
+        
+        if board[new_pos.y][new_pos.x] is None: # Regarde si pièce tombe sur une case vide
+            return True
+        elif board[new_pos.y][new_pos.x].color != board[initial_pos.y][initial_pos.x].color: # Regarde si pièce tombe sur une pièce d'une couleur différente
+            return True
+        
+        return False
 
 class King(Piece):
     def __init__(self, color):
@@ -55,19 +65,11 @@ class King(Piece):
             for incr_x in range(-1,2,1):
                 if incr_y == 0 and incr_x == 0:
                     continue
-                elif not (0 <= pos.x + incr_x < 8) or not (0 <= pos.y + incr_y < 8):
-                    continue
-                else:
-                    new_x, new_y = pos.x + incr_x, pos.y + incr_y
 
-                    if board[new_y][new_x] is None:
-                        moves.append(Position(new_x, new_y))
-                        continue
-                    
-                    # La nouvelle position renvoie à une pièce
-                    cur_color = board[pos.y][pos.x].color
-                    if cur_color != board[new_y][new_x].color:
-                        moves.append(Position(new_x, new_y))
+                new_pos = Position(pos.x + incr_x, pos.y + incr_y)
+
+                if self.is_valid_pos(pos, new_pos, board):
+                    moves.append(new_pos)
 
         return moves
 
@@ -105,12 +107,8 @@ class Knight(Piece):
             for move in range(-1, 2, 2):
                 move_x, move_y = move if dir[0] == 0 else 0, move if dir[1] == 0 else 0 # Regarde sur quel axe regarder des deux côtés
                 new_pos = Position(pos.x + dir[0] + move_x, pos.y + dir[1] + move_y)
-                if not (0 <= new_pos.x < 8) or not (0 <= new_pos.y < 8):
-                    continue
                 
-                if board[new_pos.y][new_pos.x] is None:
-                    moves.append(new_pos)
-                elif board[new_pos.y][new_pos.x].color != board[pos.y][pos.x].color:
+                if self.is_valid_pos(pos, new_pos, board):
                     moves.append(new_pos)
         
         return moves
