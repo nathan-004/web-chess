@@ -25,26 +25,43 @@ def start_board() -> list[list]:
     return board
 
 class Piece:
-    def __init__(self, color):
+    VALID_LIMIT = 1 # Constante définissant le renvoi de `self.is_valid_pos` maximum correspondant à un coup valide
+
+    def __init__(self, color, initial_position: Optional[Position] = None):
         self.color = color
         self.symbol = " "
         self.moves = []
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list:
+        if self.initial_position is None:
+            self.initial_position = pos
+
         return []
     
-    def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]):
+    def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]) -> int:
+        """
+        Regarde si le coups est possible
+        Renvoie : 
+        - Coups possible:
+            - 0 -> tombe sur une case vide
+            - 1 -> tombe sur une pièce adverse
+        - Coups impossible:
+            - 2 -> hors du terrain
+            - 3 -> coups identique position initiale
+            - 4 -> tombe sur une pièce alliée
+        """
         if not (0 <= new_pos.x < 8) or not (0 <= new_pos.y < 8): # Regarde si pièce sort du terrain 
-            return False
+            return 2
         if initial_pos.x == new_pos.x and initial_pos.y == new_pos.y:
-            return False
+            return 3
         
         if board[new_pos.y][new_pos.x] is None: # Regarde si pièce tombe sur une case vide
-            return True
+            return 0
         elif board[new_pos.y][new_pos.x].color != board[initial_pos.y][initial_pos.x].color: # Regarde si pièce tombe sur une pièce d'une couleur différente
-            return True
+            return 1
         
-        return False
+        return 4
 
 class King(Piece):
     def __init__(self, color):
@@ -59,6 +76,7 @@ class King(Piece):
         posY:int:position Y de la pièce
         board:list # Passage par référence : pas de modifications
         """
+        super().get_moves(pos, board)
         moves = []
 
         for incr_y in range(-1, 2, 1):
@@ -68,7 +86,7 @@ class King(Piece):
 
                 new_pos = Position(pos.x + incr_x, pos.y + incr_y)
 
-                if self.is_valid_pos(pos, new_pos, board):
+                if self.is_valid_pos(pos, new_pos, board) <= self.VALID_LIMIT:
                     moves.append(new_pos)
 
         return moves
@@ -101,6 +119,7 @@ class Knight(Piece):
         posY:int:position Y de la pièce  
         board:list # Passage par référence : pas de modifications  
         """
+        super().get_moves(pos, board)
         moves = []
 
         for dir in [(-2, 0), (0, 2), (2, 0), (0, -2)]: # Liste des directions possibles (x,y)
@@ -108,7 +127,7 @@ class Knight(Piece):
                 move_x, move_y = move if dir[0] == 0 else 0, move if dir[1] == 0 else 0 # Regarde sur quel axe regarder des deux côtés
                 new_pos = Position(pos.x + dir[0] + move_x, pos.y + dir[1] + move_y)
                 
-                if self.is_valid_pos(pos, new_pos, board):
+                if self.is_valid_pos(pos, new_pos, board) <= self.VALID_LIMIT:
                     moves.append(new_pos)
         
         return moves
@@ -126,16 +145,24 @@ class Pawn(Piece):
         posY:int:position Y de la pièce  
         board:list # Passage par référence : pas de modifications  
         """
+        super().get_moves(pos, board)
         moves = []
 
-        for x in range(-1, 2, 1):
-            if not (0 <= pos.x+x < 8) or not (0 <= pos.y+1 < 8):
-                continue
+        for incr_y in range(-1, -3 if self.initial_position == pos else -2, -1):
+            new_pos = Position(pos.x, pos.y + incr_y)
 
-            if board[pos.y+1][pos.x+x] is None:
-                moves.append(Position(pos.x+x, pos.y+1))
-            elif board[pos.y+1][pos.x+x].color != board[pos.y][pos.x].color:
-                moves.append(Position(pos.x+x, pos.y+1))
+            valid = self.is_valid_pos(pos, new_pos, board)
+            
+            if valid == 0:
+                moves.append(new_pos)
+            if valid == 1 or valid == 4:
+                break
+        
+        for incr_x in range(-1, 2, 2):
+            new_pos = Position(pos.x + incr_x, pos.y - 1)
+            valid = self.is_valid_pos(pos, new_pos, board)
+            if valid == 1:
+                moves.append(new_pos)
 
         return moves
 
@@ -244,8 +271,10 @@ class ChessBoard:
 if __name__ == "__main__":
     game = ChessBoard()
     game.display()
-    game.display_moves(1, 7)
-    game.move((1,7), (2,6))
-    game.move((1,7), (2,5))
-    game.display_moves(2, 5)
+    game.display_moves(4, 6)
+    game.move((4,6), (4,4))
+    game.move((4,4), (4,3))
+    game.move((4,3), (4,2))
+    print("display")
+    game.display_moves(4, 2)
     game.display()
