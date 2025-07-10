@@ -14,3 +14,7 @@ def test_king_moves():
     board = ChessBoard()
     moves = board.board[0][4].get_moves(Position(4,0), board.board)
     assert len(moves) == 0
+
+    board.board[0][3] = Pawn(WHITE)
+    moves = board.board[0][4].get_moves(Position(4,0), board.board)
+    assert len(moves) == 1
