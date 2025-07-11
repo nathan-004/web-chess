@@ -189,6 +189,7 @@ class Pawn(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2659' if color != WHITE else '\u265F'
+        self.direction = -1 if color == WHITE else 1
 
     def get_moves(self, pos: Position, board) -> list[Position]:
         """        
@@ -201,7 +202,7 @@ class Pawn(Piece):
         super().get_moves(pos, board)
         moves = []
 
-        for incr_y in range(-1, -3 if self.initial_position == pos else -2, -1):
+        for incr_y in range(1 * self.direction, 3 * self.direction if self.initial_position == pos else 2 * self.direction, 1 * self.direction):
             new_pos = Position(pos.x, pos.y + incr_y)
 
             valid = self.is_valid_pos(pos, new_pos, board)
@@ -433,7 +434,6 @@ class ConsoleChessboard(ChessBoard):
             return False
 
         return Position(x, y)
-
 
 if __name__ == "__main__":
     game = ConsoleChessboard()
