@@ -96,6 +96,23 @@ class Queen(Piece):
         super().__init__(color)
         self.symbol = '\u2655' if color != WHITE else '\u265B'
 
+    def get_moves(self, pos: Position, board: list) -> list[Position]:
+        super().get_moves(pos, board)
+        moves = []
+
+        for incr in Bishop.BISHOP_DIRECTIONS + Rook.ROOK_DIRECTIONS:
+            current_x, current_y = pos.x + incr.x, pos.y + incr.y
+            valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
+            while valid == 0:
+                moves.append(Position(current_x, current_y))
+                current_x += incr.x
+                current_y += incr.y
+                valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
+            if valid == 1:
+                moves.append(Position(current_x, current_y))
+
+        return moves
+
 class Rook(Piece):
     ROOK_DIRECTIONS = [Position(-1, 0), Position(1, 0), Position(0, -1), Position(0, 1)]
     def __init__(self, color):
@@ -307,7 +324,7 @@ class ChessBoard:
 if __name__ == "__main__":
     game = ChessBoard(board=blank_board())
     game.display()
-    game.board[3][3] = Bishop(WHITE)
+    game.board[3][3] = Queen(WHITE)
     game.board[4][2] = Pawn(BLACK)
     game.board[2][4] = Pawn(WHITE)
     game.display_moves(3,3, game.board)
