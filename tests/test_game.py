@@ -44,6 +44,7 @@ def test_pawn_moves():
     # Pion blanc qui ne peut avancer que d'une case
     b = blank_board()
     b[5][3] = Pawn(WHITE)
+    b[5][3].initial_position = Position(3, 7)
     moves = b[5][3].get_moves(Position(3, 5), b)
     assert moves == [Position(3, 4)]
 
@@ -57,3 +58,23 @@ def test_pawn_moves():
     assert Position(1, 3) in moves  # capture à gauche
     assert Position(3, 3) in moves  # capture à droite
     assert len(moves) == 3
+
+def test_is_check_detection():
+    # Plateau vide
+    b = blank_board()
+    # Place un roi blanc
+    b[4][4] = King(WHITE)
+    # Place une reine noire menaçante
+    b[4][0] = Queen(BLACK)
+    board = ChessBoard(b)
+    assert board.is_check(WHITE) == True
+
+    # Place un pion blanc pour bloquer la reine
+    b[4][2] = Pawn(WHITE)
+    board = ChessBoard(b)
+    assert board.is_check(WHITE) == False
+
+    # Place un roi noir non menacé
+    b[0][0] = King(BLACK)
+    board = ChessBoard(b)
+    assert board.is_check(BLACK) == False
