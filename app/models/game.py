@@ -222,6 +222,7 @@ class Pawn(Piece):
 
 class ChessBoard:
     """Contient les positions des pièces"""
+    PIECES = [cls for cls in Piece.__subclasses__()]
 
     def __init__(self, board:Optional[list] = None):
         if board is None:
@@ -279,6 +280,47 @@ class ChessBoard:
             return True
         
         return False
+    
+    def is_check(self, color: Optional[str] = None, board: Optional[list[list]] = None):
+        """
+        Regarde si le roi est en échecs en regardant si les trajectoires des pièces adverses le touchent
+        Regarder les mouvements de chaques pièces à la place du roi
+        Si une des pièces du même type se trouve dans les trajectoires il y a échec
+
+        Parameters
+        ----------
+        color:str
+            Si défini, ne cherchera que l'échec sur le roi de la couleur donnée
+            Sinon cherchera pour les deux rois
+        board:list
+        """
+        if board is None:
+            board = self.board # Passage par référence
+
+        kings = self.find_pieces(King, color, board)
+
+        for pos_king in kings:
+            cur_king = board[pos_king.y][pos_king.x]
+            for piece_type in self.PIECES:
+                moves = piece_type(cur_king.color).get_moves(pos_king, board)
+                for pos in moves:
+                    if isinstance(board[pos.y][pos.x], piece_type):
+                        return True
+        
+        return False
+
+    def find_pieces(self, piece_type: Piece, color: Optional[str] = None, board: Optional[list[list]] = None) -> list[Position]:
+        """Retourne une liste des positions des pièces qui remplissent les conditions données"""  
+        if board is None:
+            board = self.board
+
+        positions = []
+        for y, row in enumerate(board):
+            for x, piece in enumerate(row):
+                if type(piece) is piece_type and (piece.color == color or color is None):
+                    positions.append(Position(x, y))
+            
+        return positions
     
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
@@ -437,4 +479,3 @@ class ConsoleChessboard(ChessBoard):
 
 if __name__ == "__main__":
     game = ConsoleChessboard()
-    game.play()
