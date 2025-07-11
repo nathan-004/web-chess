@@ -304,32 +304,137 @@ class ConsoleChessboard(ChessBoard):
         
         print("")
 
-    def display_moves(self, x, y, board:Optional[list] = None) -> None:
+    def display_moves(self, xx, yy, board:Optional[list] = None) -> None:
         """Affiche l'échiquier et les coups possibles pour la pièce à la position (x,y)"""
         if board is None:
             board = self.board # Passage par récurrence, pas de modifications
         
-        assert 8 > x >= 0, "La position X donnée n'est pas valide"
-        assert 8 > y >= 0, "La position Y donnée n'est pas valide"
+        assert 8 > xx >= 0, "La position X donnée n'est pas valide"
+        assert 8 > yy >= 0, "La position Y donnée n'est pas valide"
 
-        moves = board[y][x].get_moves(Position(x,y), board)
+        moves = board[yy][xx].get_moves(Position(xx,yy), board)
 
         for y, row in enumerate(board):
             # print(f"\n{'-' * 24}")
             print("")
             for x, piece in enumerate(row):
-                if (x,y) not in moves:
+                if x == xx and y == yy:
+                    print(f"\033[31m{piece.symbol}\033[0m", end=" |")
+                elif (x,y) not in moves:
                     print(piece.symbol if piece is not None else " ", end=" |")
                 else:
                     print("#", end=" |")
         
         print("")
 
+    def play(self):
+        """Lance une partie dans la console"""
+        turn = WHITE
+
+        while True:
+            # Récupérer la pièce de départ
+            user_start_move = ""
+            valid = self.is_valid_start_move(user_start_move, turn)
+            while valid is False:
+                user_start_move = input("Pièce à bouger : ")
+                valid = self.is_valid_start_move(user_start_move, turn)
+            user_start_move = valid
+            self.display_moves(user_start_move.x, user_start_move.y)
+
+            # Récupérer où déplacer la pièce sélectionnée
+            user_end_move = ""
+            valid = self.is_valid_end_move(user_end_move, user_start_move)
+            while valid is False:
+                user_end_move = input("Où placer la pièce : ")
+                valid = self.is_valid_end_move(user_end_move, user_start_move)
+            user_end_move = valid
+
+            # Déplacer la pièce
+            self.move(user_start_move, user_end_move)
+            self.display()
+            turn = BLACK if turn == WHITE else WHITE
+
+    def is_valid_start_move(self, user_input: str, color: str) -> Optional[Position]:
+        """
+        Vérifie si la pièce donnée par l'utilisateur est valide
+
+        Parameters
+        ----------
+        user_input:string
+            Soit deux chiffres correspondant à `xy`
+            Ou une lettre et un chiffre correspondant à `xy`
+        color:string
+            Couleur du joueur pour vérifier si la pièce est bien la sienne
+
+        Returns
+        -------
+        False -> Coups non valide
+        Position(x, y) -> Coups valide
+        """
+        # Nettoyage de l'entrée
+        user_input = user_input.strip().lower()
+        print(user_input, len(user_input))
+        if len(user_input) != 2:
+            print("Taille de l'input trop grande")
+            return False
+
+        # Conversion lettre/chiffre en coordonnées
+        if user_input[0].isalpha() and user_input[1].isdigit():
+            x = ord(user_input[0]) - ord('a')
+            y = 8 - int(user_input[1])
+        elif user_input[0].isdigit() and user_input[1].isdigit():
+            x = int(user_input[0])
+            y = int(user_input[1])
+        else:
+            print("format non respecté")
+            return False
+
+        # Vérification des bornes
+        if not (0 <= x < 8 and 0 <= y < 8):
+            return False
+
+        piece = self.board[y][x]
+        if piece is None or piece.color != color:
+            print("pas la bonne pièce")
+            return False
+
+        return Position(x, y)
+
+    def is_valid_end_move(self, user_input, start_move: Position) -> Optional[Position]: 
+        """
+        Vérifie si le coup est valide et respecte les mouvements des pièces
+        Retourne False si n'est pas valide sinon la position donnée
+        """
+        # Nettoyage de l'entrée
+        user_input = user_input.strip().lower()
+        print(user_input, len(user_input))
+        if len(user_input) != 2:
+            print("Taille de l'input trop grande")
+            return False
+
+        # Conversion lettre/chiffre en coordonnées
+        if user_input[0].isalpha() and user_input[1].isdigit():
+            x = ord(user_input[0]) - ord('a')
+            y = 8 - int(user_input[1])
+        elif user_input[0].isdigit() and user_input[1].isdigit():
+            x = int(user_input[0])
+            y = int(user_input[1])
+        else:
+            print("format non respecté")
+            return False
+
+        # Vérification des bornes
+        if not (0 <= x < 8 and 0 <= y < 8):
+            return False
+
+        start_piece = self.board[start_move.y][start_move.x]
+        if not Position(x, y) in start_piece.get_moves(Position(start_move.x, start_move.y), self.board):
+            print("non respect des mouvements des pièces")
+            return False
+
+        return Position(x, y)
+
+
 if __name__ == "__main__":
-    game = ConsoleChessboard(board=blank_board())
-    game.display()
-    game.board[3][3] = Queen(WHITE)
-    game.board[4][2] = Pawn(BLACK)
-    game.board[2][4] = Pawn(WHITE)
-    game.display_moves(3,3, game.board)
-    game.display()
+    game = ConsoleChessboard()
+    game.play()
