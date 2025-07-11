@@ -51,6 +51,7 @@ def test_pawn_moves():
     # Pion blanc qui peut capturer à gauche et à droite
     b = blank_board()
     b[4][2] = Pawn(WHITE)
+    b[4][2].initial_position = Position(6, 2)
     b[3][1] = Pawn(BLACK)  # pièce à capturer à gauche
     b[3][3] = Pawn(BLACK)  # pièce à capturer à droite
     moves = b[4][2].get_moves(Position(2, 4), b)
