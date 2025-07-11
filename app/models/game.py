@@ -228,48 +228,6 @@ class ChessBoard:
         else:
             self.board = board
 
-    def display(self, board:Optional[list] = None) -> None:
-        """
-        Affiche l'échiquier dans la console
-
-        Parameters
-        ----------
-        board:list
-            Matrice 8x8 représentant l'échiquier, contient des objets `Piece`
-            Si non spécifié, utilise `self.board`
-        """
-        if board is None:
-            board = self.board # Passage par récurrence, pas de modifications
-
-        for y, row in enumerate(board):
-            # print(f"\n{'-' * 24}")
-            print("")
-            for x, piece in enumerate(row):
-                print(piece.symbol if piece is not None else " ", end=" |")
-        
-        print("")
-
-    def display_moves(self, x, y, board:Optional[list] = None) -> None:
-        """Affiche l'échiquier et les coups possibles pour la pièce à la position (x,y)"""
-        if board is None:
-            board = self.board # Passage par récurrence, pas de modifications
-        
-        assert 8 > x >= 0, "La position X donnée n'est pas valide"
-        assert 8 > y >= 0, "La position Y donnée n'est pas valide"
-
-        moves = board[y][x].get_moves(Position(x,y), board)
-
-        for y, row in enumerate(board):
-            # print(f"\n{'-' * 24}")
-            print("")
-            for x, piece in enumerate(row):
-                if (x,y) not in moves:
-                    print(piece.symbol if piece is not None else " ", end=" |")
-                else:
-                    print("#", end=" |")
-        
-        print("")
-
     def move(self, start_pos, end_pos, board:Optional[list[list]] = None) -> Optional[list[list]]:
         """
         Modifie `self.board` si board n'est pas spécifié, sinon retourne l'échiquier avec le coup fait
@@ -320,9 +278,55 @@ class ChessBoard:
             return True
         
         return False
+    
+class ConsoleChessboard(ChessBoard):
+    def __init__(self, board:Optional[list] = None):
+        super().__init__(board)
+
+    def display(self, board:Optional[list] = None) -> None:
+        """
+        Affiche l'échiquier dans la console
+
+        Parameters
+        ----------
+        board:list
+            Matrice 8x8 représentant l'échiquier, contient des objets `Piece`
+            Si non spécifié, utilise `self.board`
+        """
+        if board is None:
+            board = self.board # Passage par récurrence, pas de modifications
+
+        for y, row in enumerate(board):
+            # print(f"\n{'-' * 24}")
+            print("")
+            for x, piece in enumerate(row):
+                print(piece.symbol if piece is not None else " ", end=" |")
+        
+        print("")
+
+    def display_moves(self, x, y, board:Optional[list] = None) -> None:
+        """Affiche l'échiquier et les coups possibles pour la pièce à la position (x,y)"""
+        if board is None:
+            board = self.board # Passage par récurrence, pas de modifications
+        
+        assert 8 > x >= 0, "La position X donnée n'est pas valide"
+        assert 8 > y >= 0, "La position Y donnée n'est pas valide"
+
+        moves = board[y][x].get_moves(Position(x,y), board)
+
+        for y, row in enumerate(board):
+            # print(f"\n{'-' * 24}")
+            print("")
+            for x, piece in enumerate(row):
+                if (x,y) not in moves:
+                    print(piece.symbol if piece is not None else " ", end=" |")
+                else:
+                    print("#", end=" |")
+        
+        print("")
 
 if __name__ == "__main__":
-    game = ChessBoard(board=blank_board())
+    game = ConsoleChessboard(board=blank_board())
     game.display()
     game.board[3][3] = Queen(WHITE)
     game.board[4][2] = Pawn(BLACK)
