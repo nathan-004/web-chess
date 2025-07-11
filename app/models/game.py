@@ -322,6 +322,14 @@ class ChessBoard:
             
         return positions
     
+    def is_checkmate(self, color:str, board: Optional[list[list]]) -> bool:
+        """Vérifie si le roi de la couleur donnée est échec et mat"""
+        if board is None:
+            board = self.board.copy()
+
+        if not self.is_check(color, board):
+            return False
+    
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
         super().__init__(board)
