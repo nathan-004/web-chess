@@ -120,9 +120,27 @@ class Rook(Piece):
         return list(set(moves))
 
 class Bishop(Piece):
+    BISHOP_DIRECTIONS = [Position(1, 1), Position(1, -1), Position(-1, -1), Position(-1, 1)]
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2657' if color != WHITE else '\u265D'
+
+    def get_moves(self, pos: Position, board: list) -> list[Position]:
+        super().get_moves(pos, board)
+        moves = []
+
+        for incr in self.BISHOP_DIRECTIONS:
+            current_x, current_y = pos.x + incr.x, pos.y + incr.y
+            valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
+            while valid == 0:
+                moves.append(Position(current_x, current_y))
+                current_x += incr.x
+                current_y += incr.y
+                valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
+            if valid == 1:
+                moves.append(Position(current_x, current_y))
+
+        return moves
 
 class Knight(Piece):
     def __init__(self, color):
@@ -289,8 +307,8 @@ class ChessBoard:
 if __name__ == "__main__":
     game = ChessBoard(board=blank_board())
     game.display()
-    game.board[3][3] = Rook(WHITE)
-    game.board[3][2] = Pawn(BLACK)
-    game.board[3][4] = Pawn(WHITE)
+    game.board[3][3] = Bishop(WHITE)
+    game.board[4][2] = Pawn(BLACK)
+    game.board[2][4] = Pawn(WHITE)
     game.display_moves(3,3, game.board)
     game.display()
