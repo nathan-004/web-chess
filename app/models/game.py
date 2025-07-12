@@ -329,6 +329,11 @@ class ChessBoard:
 
         if not self.is_check(color, board):
             return False
+
+        for king_pos in self.find_pieces(King, color, board):
+            for move in board[king_pos.y][king_pos.x].get_moves(king_pos, board):
+                if not self.is_check(color,self.move(king_pos, move, board.copy())):
+                    return False
     
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
