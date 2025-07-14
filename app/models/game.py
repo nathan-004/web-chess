@@ -1,4 +1,5 @@
 from typing import Optional, NamedTuple
+import copy
 
 # Constantes définissant le string représentant chaque couleurs
 WHITE = "white"
@@ -236,9 +237,9 @@ class ChessBoard:
 
         Parameters
         ----------
-        start_pos:tuple:(x,y)
-        end_pos:tuple:(x,y)
-        board:list: échiquier, si non spécifié, modification de `self.board`
+        start_pos:tuple:(x,y)  
+        end_pos:tuple:(x,y)  
+        board:list: échiquier, si non spécifié, modification de `self.board`  
         """
         if board is None:
             board = self.board # Passage par référence pour faire des modifications
@@ -325,11 +326,22 @@ class ChessBoard:
     def is_checkmate(self, color:str, board: Optional[list[list]]) -> bool:
         """Vérifie si le roi de la couleur donnée est échec et mat"""
         if board is None:
-            board = self.board.copy()
+            board = copy.deepcopy(self.board)
 
         if not self.is_check(color, board):
             return False
     
+        for king_pos in self.find_pieces(King, color, board):
+            for move in board[king_pos.y][king_pos.x].get_moves(king_pos, board):
+                new_board = self.move(king_pos, move, copy.deepcopy(board))
+                if new_board == 1: # Coups non valide
+                    continue
+
+                if not self.is_check(color, new_board):
+                    return False
+        
+        return True
+
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
         super().__init__(board)
