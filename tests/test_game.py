@@ -79,3 +79,29 @@ def test_is_check_detection():
     b[0][0] = King(BLACK)
     board = ChessBoard(b)
     assert board.is_check(BLACK) == False
+
+def test_checkmate_detection():
+    b = blank_board()
+    b[0][0] = King(WHITE)
+    # Place deux tours noires pour le mat
+    b[0][2] = Rook(BLACK)
+    b[1][2] = Rook(BLACK)
+    board = ConsoleChessboard(b)
+    board.display()
+    assert board.is_check(WHITE) == True
+    assert board.is_checkmate(WHITE, b) == True
+
+    # Place une pièce blanche pour bloquer le mat
+    b[1][1] = Pawn(WHITE)
+    board = ConsoleChessboard(b)
+    board.display()
+    assert board.is_check(WHITE) == True
+    assert board.is_checkmate(WHITE, b) == False
+
+    # Roi noir non menacé
+    b = blank_board()
+    b[7][7] = King(BLACK)
+    board = ConsoleChessboard(b)
+    board.display()
+    assert board.is_check(BLACK) == False
+    assert board.is_checkmate(BLACK, b) == False
