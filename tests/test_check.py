@@ -31,6 +31,13 @@ def test_checkmate_detection():
     assert board.is_check(WHITE) == True
     assert board.is_checkmate(WHITE, b) == True
 
+    # Echec et mat avec une pièce pouvant s'interposer
+    b[7][1] = Rook(WHITE)
+    board = ConsoleChessboard(b)
+    board.display()
+    assert board.is_check(WHITE) == True
+    assert board.is_checkmate(WHITE, b) == False
+
     # Place une pièce blanche pour bloquer le mat
     b[1][1] = Pawn(WHITE)
     board = ConsoleChessboard(b)
