@@ -250,8 +250,7 @@ class ChessBoard:
         else:
             return 1
 
-        if not board is self.board:
-            return board
+        return board
 
     def valid_move(self, start_pos: Position, end_pos: Position, board:Optional[list]=None):
         """Vérifie si un coup peut être joué à partir des règles de mouvements dans les classes des pièces"""
@@ -330,7 +329,8 @@ class ChessBoard:
 
         if not self.is_check(color, board):
             return False
-    
+
+        # Vérifie que le roi ne peut plus bouger
         for king_pos in self.find_pieces(King, color, board):
             for move in board[king_pos.y][king_pos.x].get_moves(king_pos, board):
                 new_board = self.move(king_pos, move, copy.deepcopy(board))
@@ -339,8 +339,30 @@ class ChessBoard:
 
                 if not self.is_check(color, new_board):
                     return False
-        
-        return True
+                
+        # Vérifie qu'une pièce ne peut pas s'interposer
+        for king_pos in self.find_pieces(King, color, board):
+            for distance in range(1, 9): # Regarde toutes les pièces en commençant par les plus proches du roi
+                for incr_y in range(-distance, distance+1):
+                    for incr_x in range(-distance, distance+1):
+                        if abs(incr_x) + abs(incr_y) == distance:
+                            x, y = king_pos.x + incr_x, king_pos.y + incr_y
+                            if not(0 <= x < 8) or not(0 <= y < 8):
+                                continue
+
+                            piece = board[y][x]
+                            if piece is None:
+                                continue
+                            elif piece.color != board[king_pos.y][king_pos.x].color:
+                                continue
+
+                            for piece_move in piece.get_moves(Position(x, y), board):
+                                new_board = self.move((x, y), (piece_move.x, piece_move.y), copy.deepcopy(board))
+                                if type(new_board) is list:
+                                    if not self.is_check(piece.color, new_board):
+                                        return False
+                                    
+        return True # Si le roi est en échec, qu'il ne peut pas bouger, qu'aucune pièce ne peut se mettre au travers : echec et mats
 
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
