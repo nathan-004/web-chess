@@ -17,13 +17,7 @@
   <div id="board"></div>
 
   <script src="{{ url_for('static', filename='js/chessboard.js') }}"></script>
-  <script>
-    const board = Chessboard('board', {
-      draggable: true,
-      position: 'start',
-      pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png'
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/game.js') }}"></script>
 
 </body>
 </html>

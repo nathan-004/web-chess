@@ -33,7 +33,7 @@
   // use unique class names to prevent clashing with anything else on the page
   // and simplify selectors
   // NOTE: these should never change
-  var CSS = {}
+  window.CSS = {}
   CSS['alpha'] = 'alpha-d2270'
   CSS['black'] = 'black-3c85d'
   CSS['board'] = 'board-b72b1'
@@ -50,6 +50,7 @@
   CSS['sparePiecesTop'] = 'spare-pieces-top-4028b'
   CSS['square'] = 'square-55d63'
   CSS['white'] = 'white-1e1d7'
+  CSS['highlightMove1'] = 'move-square'
 
   // ---------------------------------------------------------------------------
   // Misc Util Functions

@@ -4,6 +4,29 @@ class Position(NamedTuple):
     x:int
     y:int
 
+def string_to_position(position:str) -> Position:
+    """Retourne l'objet position si l'entrée est correcte sinon None"""
+    if not(position[0].isalpha() and position[1].isdigit()):
+        return None
+    
+    x = ord(position[0]) - ord('a')
+    y = 8 - int(position[1])
+
+    if not(0 <= x < 8) and not(0 <= x < 8):
+        return None
+
+    return Position(x, y)
+
+def position_to_string(position: Position) -> str:
+    """Convertit un objet Position vers une chaîne en notation algébrique (ex: Position(4, 6) ➜ 'e2')."""
+    if not (0 <= position.x <= 7 and 0 <= position.y <= 7):
+        raise ValueError("Coordonnées hors échiquier")
+
+    col = chr(position.x + ord('a'))
+    row = str(8 - position.y)
+
+    return col + row
+
 class Piece:
     VALID_LIMIT = 1 # Constante définissant le renvoi de `self.is_valid_pos` maximum correspondant à un coup valide
 
