@@ -1,8 +1,8 @@
 from typing import Optional
 import copy
 
-from app.models.pieces import *
-from app.models.utils import Position, Piece, WHITE, BLACK, Move
+from app.engine.pieces import *
+from app.engine.utils import Position, Piece, WHITE, BLACK, Move
 
 def blank_board() -> list[list]:
     """Retourne un échiquier vide"""

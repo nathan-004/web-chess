@@ -1,4 +1,4 @@
-from app.models.utils import Position, Piece, WHITE, BLACK
+from app.engine.utils import Position, Piece, WHITE, BLACK
 
 class King(Piece):
     def __init__(self, color):

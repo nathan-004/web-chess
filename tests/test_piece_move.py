@@ -1,4 +1,4 @@
-from app.models.game import *
+from app.engine.game import *
 
 def test_king_moves():
     b = blank_board()
