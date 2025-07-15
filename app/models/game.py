@@ -1,15 +1,8 @@
-from typing import Optional, NamedTuple
+from typing import Optional
 import copy
 
-from pieces import *
-
-# Constantes définissant le string représentant chaque couleurs
-WHITE = "white"
-BLACK = "black"
-
-class Position(NamedTuple):
-    x:int
-    y:int
+from app.models.pieces import *
+from app.models.utils import Position, Piece, WHITE, BLACK, Move
 
 def blank_board() -> list[list]:
     """Retourne un échiquier vide"""
@@ -36,6 +29,7 @@ class ChessBoard:
             self.board = start_board()
         else:
             self.board = board
+        self.moves = [] # Liste de coups joués
 
     def move(self, start_pos, end_pos, board:Optional[list[list]] = None) -> Optional[list[list]]:
         """
@@ -53,6 +47,8 @@ class ChessBoard:
         # Vérifier si le coup est possible
         if self.valid_move(Position(*start_pos), Position(*end_pos), board):
             board[start_pos[1]][start_pos[0]], board[end_pos[1]][end_pos[0]] = None, board[start_pos[1]][start_pos[0]]
+            if board is self.board:
+                self.moves.append(Move(piece = board[end_pos[1]][end_pos[0]], start_pos=start_pos, end_pos=end_pos))
         else:
             return 1
 
@@ -174,7 +170,19 @@ class ChessBoard:
                                         return False
                                     
         return True # Si le roi est en échec, qu'il ne peut pas bouger, qu'aucune pièce ne peut se mettre au travers : echec et mats
+    
+    def undo(self, n = 1):
+        """
+        **Enlève le dernier coup joué**
+        ---
+        n:int Nombre de derniers coups à enlever
+        """
+        for _ in range(n):
+            if len(self.moves) > 0:
+                move = self.moves.pop()
+                self.board[move.end_pos.y][move.end_pos.x], self.board[move.start_pos.y][move.start_pos.x] = None, self.board[move.end_pos.y][move.end_pos.x]
 
+# ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):
     def __init__(self, board:Optional[list] = None):
         super().__init__(board)
@@ -229,12 +237,23 @@ class ConsoleChessboard(ChessBoard):
 
         while True:
             # Récupérer la pièce de départ
+            self.display()
             passs = False
             user_start_move = ""
+            turn = [WHITE, BLACK][len(self.moves)%2]
+
             valid = self.is_valid_start_move(user_start_move, turn)
             while valid is False:
                 user_start_move = input("Pièce à bouger : ")
+                if user_start_move.startswith("undo"):
+                    self.undo()
+                    passs = True
+                    break
                 valid = self.is_valid_start_move(user_start_move, turn)
+
+            if passs:
+                continue
+            
             user_start_move = valid
             self.display_moves(user_start_move.x, user_start_move.y)
 
@@ -255,7 +274,6 @@ class ConsoleChessboard(ChessBoard):
             # Déplacer la pièce
             self.move(user_start_move, user_end_move)
             self.display()
-            turn = BLACK if turn == WHITE else WHITE
 
     def is_valid_start_move(self, user_input: str, color: str) -> Optional[Position]:
         """
@@ -337,6 +355,6 @@ class ConsoleChessboard(ChessBoard):
 
         return Position(x, y)
 
-if __name__ == "__main__":
+def main():
     game = ConsoleChessboard()
     game.play()
