@@ -1,5 +1,5 @@
 from typing import Optional, NamedTuple
-import copy
+import copy 
 
 # Constantes définissant le string représentant chaque couleurs
 WHITE = "white"
@@ -276,10 +276,15 @@ class ChessBoard:
                 return False
         
         moves = board[start_pos.y][start_pos.x].get_moves(start_pos, board)
-        if end_pos in moves:
-            return True
+        if not end_pos in moves:
+            return False
         
-        return False
+        new_board = copy.deepcopy(board)
+        new_board[start_pos.y][start_pos.x], new_board[end_pos.y][end_pos.x] = None, new_board[start_pos.y][start_pos.x]
+        if self.is_check(color=board[start_pos.y][start_pos.x].color, board=new_board):
+            return False
+
+        return True
     
     def is_check(self, color: Optional[str] = None, board: Optional[list[list]] = None):
         """
@@ -418,6 +423,7 @@ class ConsoleChessboard(ChessBoard):
 
         while True:
             # Récupérer la pièce de départ
+            passs = False
             user_start_move = ""
             valid = self.is_valid_start_move(user_start_move, turn)
             while valid is False:
@@ -431,8 +437,14 @@ class ConsoleChessboard(ChessBoard):
             valid = self.is_valid_end_move(user_end_move, user_start_move)
             while valid is False:
                 user_end_move = input("Où placer la pièce : ")
+                if user_end_move == "quit" or user_end_move == "q":
+                    passs = True
+                    break
                 valid = self.is_valid_end_move(user_end_move, user_start_move)
             user_end_move = valid
+
+            if passs:
+                continue
 
             # Déplacer la pièce
             self.move(user_start_move, user_end_move)
@@ -521,3 +533,4 @@ class ConsoleChessboard(ChessBoard):
 
 if __name__ == "__main__":
     game = ConsoleChessboard()
+    game.play()
