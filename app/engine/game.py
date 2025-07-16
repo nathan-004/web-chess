@@ -34,7 +34,7 @@ def board_to_fen(board:list[list[Optional[Piece]]]) -> str:
             if blank_count != 0:
                 fen_row += str(blank_count)
                 blank_count = 0
-            fen_row += piece.letter if piece.color == WHITE else piece.letter.upper()
+            fen_row += piece.letter if piece.color == BLACK else piece.letter.upper()
         if blank_count != 0:
             fen_row += str(blank_count)
         fen += fen_row

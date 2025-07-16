@@ -116,6 +116,7 @@ async function initBoard() {
         pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
         onDragStart: onDragStart,
         onDrop: onDrop,
+        orientation: "white",
     };
 
     return Chessboard('board', config);
@@ -124,4 +125,5 @@ async function initBoard() {
 let board;
 initBoard().then(instance => {
     board = instance;
+    console.log(board.orientation());
 });
