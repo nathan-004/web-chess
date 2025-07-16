@@ -4,6 +4,7 @@ class King(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2654' if color != WHITE else '\u265A'
+        self.letter = "k"
 
     def get_moves(self, pos: Position, board) -> list[Position]:
         """
@@ -32,6 +33,7 @@ class Queen(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2655' if color != WHITE else '\u265B'
+        self.letter = "q"
 
     def get_moves(self, pos: Position, board: list) -> list[Position]:
         super().get_moves(pos, board)
@@ -55,6 +57,7 @@ class Rook(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2656' if color != WHITE else '\u265C'
+        self.letter = "r"
 
     def get_moves(self, pos: Position, board: list) -> list[Position]:
         super().get_moves(pos, board)
@@ -78,6 +81,7 @@ class Bishop(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2657' if color != WHITE else '\u265D'
+        self.letter = "b"
 
     def get_moves(self, pos: Position, board: list) -> list[Position]:
         super().get_moves(pos, board)
@@ -100,6 +104,7 @@ class Knight(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2658' if color != WHITE else '\u265E'
+        self.letter = "n"
 
     def get_moves(self, pos: Position, board) -> list[Position]:
         """        
@@ -126,6 +131,7 @@ class Pawn(Piece):
     def __init__(self, color):
         super().__init__(color)
         self.symbol = '\u2659' if color != WHITE else '\u265F'
+        self.letter = "p"
         self.direction = -1 if color == WHITE else 1
 
     def get_moves(self, pos: Position, board) -> list[Position]:

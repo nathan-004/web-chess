@@ -1,3 +1,3 @@
-from app.main import main
+from app.engine.game import main
 
 main()

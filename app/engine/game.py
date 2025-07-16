@@ -20,6 +20,26 @@ def start_board() -> list[list]:
 
     return board
 
+def board_to_fen(board:list[list[Optional[Piece]]]) -> str:
+    """Retourne la notation fen de l'échiquier"""
+    fen = ""
+
+    for y, row in enumerate(reversed(board)):
+        fen_row = "/" if y != 0 else ""
+        blank_count = 0
+        for x, piece in enumerate(row):
+            if piece is None:
+                blank_count += 1
+                continue
+            if blank_count != 0:
+                fen_row += str(blank_count)
+                blank_count = 0
+            fen_row += piece.letter if piece.color == WHITE else piece.letter.upper()
+        if blank_count != 0:
+            fen_row += str(blank_count)
+        fen += fen_row
+    return fen
+
 class ChessBoard:
     """Contient les positions des pièces"""
     PIECES = [cls for cls in Piece.__subclasses__()]
@@ -357,4 +377,4 @@ class ConsoleChessboard(ChessBoard):
 
 def main():
     game = ConsoleChessboard()
-    game.play()
+    print(board_to_fen(game.board))
