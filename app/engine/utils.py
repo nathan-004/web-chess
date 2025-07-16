@@ -6,13 +6,16 @@ class Position(NamedTuple):
 
 def string_to_position(position:str) -> Position:
     """Retourne l'objet position si l'entrée est correcte sinon None"""
+    if not len(position) == 2:
+        return None
+
     if not(position[0].isalpha() and position[1].isdigit()):
         return None
     
     x = ord(position[0]) - ord('a')
     y = 8 - int(position[1])
 
-    if not(0 <= x < 8) and not(0 <= x < 8):
+    if not(0 <= x < 8) or not(0 <= y < 8):
         return None
 
     return Position(x, y)
