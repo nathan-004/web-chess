@@ -1,14 +1,37 @@
 from flask import Flask, render_template, request, jsonify
+from collections import defaultdict
+import uuid
 
 from app.engine.game import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string
+from app.engine.utils import WHITE, BLACK
+
+ID_GAME_SIZE = 8
 
 app = Flask(__name__)
-chessboard = ChessBoard()
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+def create_chessboard_instance():
+    board = ChessBoard()
+    board.players = 0
+    return board
+
+chessboards = defaultdict(create_chessboard_instance)
+
+@app.route("/create_board_id", methods=["POST"])
+def create_chessboard():
+    """Ajoute une ligne dans chessboards avec un identifiant uniique"""
+    id = str(uuid.uuid4())[:ID_GAME_SIZE]
+    chessboards[id] = create_chessboard_instance()
+    return jsonify({"id": id})
+
+@app.route('/game/<game_id>')
+def game_page(game_id):
+    if chessboards[game_id].players >= 2:
+        return render_template('index.html')
+    orientation = WHITE if chessboards[game_id].players == 0 else BLACK
+    chessboards[game_id].players += 1
+    print(chessboards[game_id].players)
+    return render_template('game.html', game_id=game_id, orientation=orientation)
 
 @app.route('/get_moves', methods=['POST'])
 def get_moves():
@@ -20,6 +43,7 @@ def get_moves():
     """
     data = request.get_json()
     source = data.get('source')
+    id = data.get('id')
 
     if not source:
         return jsonify({"error": "Source non fournie"}), 400
@@ -28,11 +52,11 @@ def get_moves():
     if not start_pos:
         return jsonify({"error": "Coordonnée invalide"}), 400
 
-    piece = chessboard.board[start_pos.y][start_pos.x]
+    piece = chessboards[id].board[start_pos.y][start_pos.x]
     if piece is None:
         return jsonify({"moves": []})
 
-    moves = piece.get_moves(start_pos, chessboard.board)
+    moves = piece.get_moves(start_pos, chessboards[id].board)
     moves_str = [position_to_string(pos) for pos in moves]
     print(moves_str)
     return jsonify({"moves": moves_str})
@@ -48,6 +72,7 @@ def move_piece():
     data = request.get_json()
     source = data.get("source")
     dest = data.get("destination")
+    id = data.get("id")
 
     if not source or not dest:
         return jsonify({"error": "Position non fournies"}), 400
@@ -56,7 +81,7 @@ def move_piece():
     if not start_pos or not end_pos:
         return jsonify({"error": "Coordonnée invalide"}), 400
     
-    valid = chessboard.move(start_pos, end_pos)
+    valid = chessboards[id].move(start_pos, end_pos)
     print(not valid == 1)
 
     return jsonify({"valid": not valid == 1})
@@ -64,7 +89,10 @@ def move_piece():
 @app.route("/get_current_board", methods=["POST"])
 def get_board():
     """Retourne l'échiquier en notation fen"""
-    fen = board_to_fen(chessboard.board)
+    data = request.get_json()
+    id = data.get("id")
+
+    fen = board_to_fen(chessboards[id].board)
     print(fen)
     return jsonify({"board": fen})
 

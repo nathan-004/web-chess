@@ -29,7 +29,7 @@ async function getMoves(source) {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ source })
+            body: JSON.stringify({ source, "id": id })
         });
 
         if (!response.ok) {
@@ -53,7 +53,7 @@ async function movePiece(source, destination) {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ source, destination })
+            body: JSON.stringify({ source, destination, "id": id })
         });
 
         if (!response.ok) {
@@ -69,12 +69,14 @@ async function movePiece(source, destination) {
 }
 
 async function getBoard() {
-    // Retourne l'échiquier sur le serveur
     const response = await fetch('/get_current_board', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
+        body: JSON.stringify({
+            id: id  // Assure-toi que la variable `id` existe dans le contexte
+        })
     });
 
     if (!response.ok) {
@@ -84,6 +86,7 @@ async function getBoard() {
     const data = await response.json();
     return data.board;
 }
+
 
 // ---------------------------------------------------------------------------
 // Events Functions
@@ -122,7 +125,6 @@ async function initBoard() {
     return Chessboard('board', config);
 }
 
-let board;
 initBoard().then(instance => {
     board = instance;
     console.log(board.orientation());
