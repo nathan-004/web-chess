@@ -24,7 +24,7 @@ def board_to_fen(board:list[list[Optional[Piece]]]) -> str:
     """Retourne la notation fen de l'échiquier"""
     fen = ""
 
-    for y, row in enumerate(reversed(board)):
+    for y, row in enumerate(board):
         fen_row = "/" if y != 0 else ""
         blank_count = 0
         for x, piece in enumerate(row):

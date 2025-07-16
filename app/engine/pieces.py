@@ -156,7 +156,7 @@ class Pawn(Piece):
                 break
         
         for incr_x in range(-1, 2, 2):
-            new_pos = Position(pos.x + incr_x, pos.y - 1)
+            new_pos = Position(pos.x + incr_x, pos.y + self.direction)
             valid = self.is_valid_pos(pos, new_pos, board)
             if valid == 1:
                 moves.append(new_pos)
