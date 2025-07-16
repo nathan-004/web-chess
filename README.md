@@ -60,7 +60,8 @@ pytest
 
 ## Ressources
 
-[Chessboard.js](https://github.com/oakmac/chessboardjs) : Bibliothèque javascript permettant d'afficher des échiquiers et de bouger les pièces
+[Chessboard.js](https://github.com/oakmac/chessboardjs) : Bibliothèque javascript permettant d'afficher des échiquiers et de bouger les pièces  
+[README file Guide](https://www.freecodecamp.org/news/how-to-write-a-good-readme-file/) : Guide sur comment écrire un fichier readme
 
 ## License
 
