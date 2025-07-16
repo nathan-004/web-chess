@@ -44,17 +44,59 @@ async function getMoves(source) {
     }
 }
 
+async function movePiece(source, destination) {
+    // Déplace la pièce si coups correct et retourne True
+    // Sinon retourne False
+    try {
+        const response = await fetch('/move', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ source, destination })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.valid;
+
+    } catch (error) {
+        console.error("Erreur lors du coups :", error);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Events Functions
+// ---------------------------------------------------------------------------
+
 function onDragStart(source, piece, position, orientation) {
     getMoves(source).then(legalMoves => {
         highlightPossibleMoves(legalMoves);
     });
 }
 
+function onDrop(source, target, piece, newPos, oldPos, orientation) {
+    movePiece(source, target).then(valid => {
+        if (!valid) {
+            board.position(oldPos);
+        }
+    });
+}
+
+
+// ---------------------------------------------------------------------------
+// Config chessboard
+// ---------------------------------------------------------------------------
+
 var config = {
     draggable: true,
     position: 'start',
     pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
     onDragStart: onDragStart,
+    onDrop: onDrop,
 }
 
 const board = Chessboard('board', config);

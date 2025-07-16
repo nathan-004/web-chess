@@ -8,6 +8,7 @@ chessboard = ChessBoard()
 
 @app.route('/')
 def home():
+    global chessboard
     chessboard = ChessBoard()
     return render_template('index.html')
 
@@ -38,6 +39,29 @@ def get_moves():
     print(moves_str)
     return jsonify({"moves": moves_str})
 
+@app.route('/move', methods=['POST'])
+def move_piece():
+    """
+    Joue un coups sur l'échiquier du serveur
+    ---
+    Reçoit : {"source": "e2", "destination": "e4"}
+    Renvoie : {"valid": True}
+    """
+    data = request.get_json()
+    source = data.get("source")
+    dest = data.get("destination")
+
+    if not source or not dest:
+        return jsonify({"error": "Position non fournies"}), 400
+    
+    start_pos, end_pos = string_to_position(source), string_to_position(dest)
+    if not start_pos or not end_pos:
+        return jsonify({"error": "Coordonnée invalide"}), 400
+    
+    valid = chessboard.move(start_pos, end_pos)
+    print(not valid == 1)
+
+    return jsonify({"valid": not valid == 1})
 
 def main():
     app.run(debug=True)
