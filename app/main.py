@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 
-from app.engine.game import ChessBoard
+from app.engine.game import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string
 
 app = Flask(__name__)
@@ -8,8 +8,6 @@ chessboard = ChessBoard()
 
 @app.route('/')
 def home():
-    global chessboard
-    chessboard = ChessBoard()
     return render_template('index.html')
 
 @app.route('/get_moves', methods=['POST'])
@@ -62,6 +60,13 @@ def move_piece():
     print(not valid == 1)
 
     return jsonify({"valid": not valid == 1})
+
+@app.route("/get_current_board", methods=["POST"])
+def get_board():
+    """Retourne l'échiquier en notation fen"""
+    fen = board_to_fen(chessboard.board)
+    print(fen)
+    return jsonify({"board": fen})
 
 def main():
     app.run(debug=True)

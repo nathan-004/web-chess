@@ -68,6 +68,23 @@ async function movePiece(source, destination) {
     }
 }
 
+async function getBoard() {
+    // Retourne l'échiquier sur le serveur
+    const response = await fetch('/get_current_board', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.board;
+}
+
 // ---------------------------------------------------------------------------
 // Events Functions
 // ---------------------------------------------------------------------------
@@ -90,12 +107,21 @@ function onDrop(source, target, piece, newPos, oldPos, orientation) {
 // Config chessboard
 // ---------------------------------------------------------------------------
 
-var config = {
-    draggable: true,
-    position: 'start',
-    pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
-    onDragStart: onDragStart,
-    onDrop: onDrop,
+async function initBoard() {
+    const boardFEN = await getBoard();
+    
+    const config = {
+        draggable: true,
+        position: boardFEN,
+        pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
+        onDragStart: onDragStart,
+        onDrop: onDrop,
+    };
+
+    return Chessboard('board', config);
 }
 
-const board = Chessboard('board', config);
+let board;
+initBoard().then(instance => {
+    board = instance;
+});
