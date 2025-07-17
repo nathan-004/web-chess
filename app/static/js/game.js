@@ -22,6 +22,14 @@ function highlightPossibleMoves(squares) {
 // Chess Util Functions -> Server
 // ---------------------------------------------------------------------------
 
+async function startSession() {
+    await fetch('/init_session', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }});
+}
+
 async function getMoves(source) {
     try {
         const response = await fetch('/get_moves', {
@@ -111,6 +119,7 @@ function onDrop(source, target, piece, newPos, oldPos, orientation) {
 // ---------------------------------------------------------------------------
 
 async function initBoard() {
+    await startSession();
     const boardFEN = await getBoard();
     
     const config = {

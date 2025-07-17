@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from collections import defaultdict
 import uuid
 
@@ -9,28 +9,46 @@ from app.engine.utils import WHITE, BLACK
 ID_GAME_SIZE = 8
 
 app = Flask(__name__)
+app.secret_key = '5QuF6Rq9GQ'
 
 def create_chessboard_instance():
     board = ChessBoard()
     board.players = 0
     return board
 
+def generate_username_uuid():
+    return f"user_{str(uuid.uuid4())[:8]}"
+
 chessboards = defaultdict(create_chessboard_instance)
+
+@app.route("/init_session", methods=["POST"])
+def init_session():
+    session["player"] = generate_username_uuid()
+    session["games"] = []
+    return jsonify({"message": "Session initialisée", "player": session["player"]})
+
 
 @app.route("/create_board_id", methods=["POST"])
 def create_chessboard():
-    """Ajoute une ligne dans chessboards avec un identifiant uniique"""
     id = str(uuid.uuid4())[:ID_GAME_SIZE]
     chessboards[id] = create_chessboard_instance()
     return jsonify({"id": id})
 
+
 @app.route('/game/<game_id>')
 def game_page(game_id):
-    if chessboards[game_id].players >= 2:
+    games = session.get("games", [])
+
+    if chessboards[game_id].players >= 2 and game_id not in games:
         return render_template('index.html')
+
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
     chessboards[game_id].players += 1
-    print(chessboards[game_id].players)
+
+    if game_id not in games:
+        games.append(game_id)
+        session["games"] = games
+
     return render_template('game.html', game_id=game_id, orientation=orientation)
 
 @app.route('/get_moves', methods=['POST'])
@@ -75,6 +93,7 @@ def move_piece():
     data = request.get_json()
     source = data.get("source")
     dest = data.get("destination")
+    orientation = data.get("orientation")
     id = data.get("id")
 
     if not source or not dest:
