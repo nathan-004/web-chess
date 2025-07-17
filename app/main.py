@@ -11,6 +11,10 @@ ID_GAME_SIZE = 8
 app = Flask(__name__)
 app.secret_key = '5QuF6Rq9GQ'
 
+# ---------------------------------------------------------------------------
+# Création des données
+# ---------------------------------------------------------------------------
+
 def create_chessboard_instance():
     board = ChessBoard()
     board.players = 0
@@ -23,8 +27,11 @@ chessboards = defaultdict(create_chessboard_instance)
 
 @app.route("/init_session", methods=["POST"])
 def init_session():
+    if "player" in session:
+        print("Session existante", session)
+        return jsonify({"message": "Session initialisée", "player": session["player"]})
     session["player"] = generate_username_uuid()
-    session["games"] = []
+    session["games"] = {}
     return jsonify({"message": "Session initialisée", "player": session["player"]})
 
 
@@ -34,20 +41,21 @@ def create_chessboard():
     chessboards[id] = create_chessboard_instance()
     return jsonify({"id": id})
 
-
 @app.route('/game/<game_id>')
 def game_page(game_id):
-    games = session.get("games", [])
+    games = session.get("games", {})
 
-    if chessboards[game_id].players >= 2 and game_id not in games:
+    if chessboards[game_id].players >= 2:
         return render_template('index.html')
-
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
-    chessboards[game_id].players += 1
 
     if game_id not in games:
-        games.append(game_id)
+        print(game_id, games)
+        games[game_id] = orientation
         session["games"] = games
+        chessboards[game_id].players += 1
+    else:
+        orientation = session["games"][game_id]
 
     return render_template('game.html', game_id=game_id, orientation=orientation)
 
