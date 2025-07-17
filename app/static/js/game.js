@@ -125,7 +125,20 @@ async function initBoard() {
     return Chessboard('board', config);
 }
 
+function main() {
+    setInterval(async function () {
+        const boardFEN = await getBoard();
+        console.log(boardFEN);
+        if (boardFEN != board.fen()) {
+            board.position(boardFEN);
+        }
+    }, 500);
+}
+
 initBoard().then(instance => {
     board = instance;
-    console.log(board.orientation());
+    if (board.orientation() != playerOrientation) {
+        board.flip();
+    }
+    main();
 });

@@ -69,7 +69,6 @@ class ChessBoard:
             board[start_pos[1]][start_pos[0]], board[end_pos[1]][end_pos[0]] = None, board[start_pos[1]][start_pos[0]]
             if board is self.board:
                 self.moves.append(Move(piece = board[end_pos[1]][end_pos[0]], start_pos=start_pos, end_pos=end_pos))
-                print(self.moves)
         else:
             return 1
 

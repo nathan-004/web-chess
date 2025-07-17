@@ -96,8 +96,7 @@ def get_board():
 
     fen = board_to_fen(chessboards[id].board)
     print(fen)
-    print(chessboards[id].moves)
     return jsonify({"board": fen})
 
 def main():
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
