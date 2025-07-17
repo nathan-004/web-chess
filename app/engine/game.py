@@ -69,6 +69,7 @@ class ChessBoard:
             board[start_pos[1]][start_pos[0]], board[end_pos[1]][end_pos[0]] = None, board[start_pos[1]][start_pos[0]]
             if board is self.board:
                 self.moves.append(Move(piece = board[end_pos[1]][end_pos[0]], start_pos=start_pos, end_pos=end_pos))
+                print(self.moves)
         else:
             return 1
 
@@ -104,6 +105,10 @@ class ChessBoard:
         new_board = copy.deepcopy(board)
         new_board[start_pos.y][start_pos.x], new_board[end_pos.y][end_pos.x] = None, new_board[start_pos.y][start_pos.x]
         if self.is_check(color=board[start_pos.y][start_pos.x].color, board=new_board):
+            return False
+        
+        turn = WHITE if len(self.moves) % 2 == 0 else BLACK
+        if board[start_pos.y][start_pos.x].color != turn:
             return False
 
         return True

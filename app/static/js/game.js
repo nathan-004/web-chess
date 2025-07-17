@@ -29,7 +29,7 @@ async function getMoves(source) {
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ source, "id": id })
+            body: JSON.stringify({ source, "id": id, "orientation": playerOrientation })
         });
 
         if (!response.ok) {

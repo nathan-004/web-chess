@@ -44,6 +44,7 @@ def get_moves():
     data = request.get_json()
     source = data.get('source')
     id = data.get('id')
+    orientation = data.get('orientation')
 
     if not source:
         return jsonify({"error": "Source non fournie"}), 400
@@ -55,6 +56,8 @@ def get_moves():
     piece = chessboards[id].board[start_pos.y][start_pos.x]
     if piece is None:
         return jsonify({"moves": []})
+    if piece.color != orientation:
+        return jsonify({"error": "Pièce de la mauvaise couleur"})
 
     moves = piece.get_moves(start_pos, chessboards[id].board)
     moves_str = [position_to_string(pos) for pos in moves]
@@ -83,7 +86,6 @@ def move_piece():
     
     valid = chessboards[id].move(start_pos, end_pos)
     print(not valid == 1)
-
     return jsonify({"valid": not valid == 1})
 
 @app.route("/get_current_board", methods=["POST"])
@@ -94,6 +96,7 @@ def get_board():
 
     fen = board_to_fen(chessboards[id].board)
     print(fen)
+    print(chessboards[id].moves)
     return jsonify({"board": fen})
 
 def main():
