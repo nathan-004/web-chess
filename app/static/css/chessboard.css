@@ -53,6 +53,15 @@
   left: 2px;
 }
 
-.move-square {
-  background-color: aqua;
+.move-square::after {
+  content: "";
+  position: absolute;
+  top: 17.5%;
+  left: 17.5%;
+  width: 65%;
+  height: 65%;
+  background-color: rgba(0, 128, 0, 0.5);
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 100%;
 }
