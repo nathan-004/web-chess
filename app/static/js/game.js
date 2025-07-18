@@ -101,6 +101,9 @@ async function getBoard() {
 // ---------------------------------------------------------------------------
 
 function onDragStart(source, piece, position, orientation) {
+    if ((orientation === 'white' && piece.search(/^w/) === -1) || (orientation === 'black' && piece.search(/^b/) === -1)) {
+        return false
+    }
     getMoves(source).then(legalMoves => {
         highlightPossibleMoves(legalMoves);
     });
@@ -141,7 +144,7 @@ function main() {
         if (boardFEN != board.fen()) {
             board.position(boardFEN);
         }
-    }, 500);
+    }, 5000);
 }
 
 initBoard().then(instance => {

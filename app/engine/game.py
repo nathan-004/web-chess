@@ -107,6 +107,7 @@ class ChessBoard:
             return False
         
         turn = WHITE if len(self.moves) % 2 == 0 else BLACK
+        print(turn)
         if board[start_pos.y][start_pos.x].color != turn:
             return False
 

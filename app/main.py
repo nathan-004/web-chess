@@ -46,7 +46,7 @@ def game_page(game_id):
     games = session.get("games", {})
 
     if chessboards[game_id].players >= 2:
-        return render_template('index.html')
+        return "<p>Trop de joueurs</p>"
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
 
     if game_id not in games:
@@ -56,6 +56,7 @@ def game_page(game_id):
         chessboards[game_id].players += 1
     else:
         orientation = session["games"][game_id]
+    print(chessboards[game_id].players)
 
     return render_template('game.html', game_id=game_id, orientation=orientation)
 
@@ -70,7 +71,7 @@ def get_moves():
     data = request.get_json()
     source = data.get('source')
     id = data.get('id')
-    orientation = data.get('orientation')
+    orientation = session.get("games")[id]
 
     if not source:
         return jsonify({"error": "Source non fournie"}), 400
@@ -101,8 +102,8 @@ def move_piece():
     data = request.get_json()
     source = data.get("source")
     dest = data.get("destination")
-    orientation = data.get("orientation")
     id = data.get("id")
+    orientation = session.get("games")[id]
 
     if not source or not dest:
         return jsonify({"error": "Position non fournies"}), 400
@@ -110,6 +111,9 @@ def move_piece():
     start_pos, end_pos = string_to_position(source), string_to_position(dest)
     if not start_pos or not end_pos:
         return jsonify({"error": "Coordonnée invalide"}), 400
+    
+    if chessboards[id].board[start_pos.y][start_pos.x].color != orientation:
+        return jsonify({"error": "Pas la bonne pièce à jouer"}), 400
     
     valid = chessboards[id].move(start_pos, end_pos)
     print(not valid == 1)
