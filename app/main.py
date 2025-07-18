@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify, session
 from collections import defaultdict
 import uuid
+import logging
 
 from app.engine.game import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string
@@ -8,6 +9,7 @@ from app.engine.utils import WHITE, BLACK
 
 ID_GAME_SIZE = 8
 
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 app = Flask(__name__)
 app.secret_key = '5QuF6Rq9GQ'
 
@@ -48,7 +50,7 @@ def game_page(game_id):
     if chessboards[game_id].players >= 2:
         return "<p>Trop de joueurs</p>"
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
-
+    logging.debug(games)
     if game_id not in games:
         print(game_id, games)
         games[game_id] = orientation
@@ -56,6 +58,7 @@ def game_page(game_id):
         chessboards[game_id].players += 1
     else:
         orientation = session["games"][game_id]
+    logging.debug(games)
     print(chessboards[game_id].players)
 
     return render_template('game.html', game_id=game_id, orientation=orientation)
@@ -71,7 +74,7 @@ def get_moves():
     data = request.get_json()
     source = data.get('source')
     id = data.get('id')
-    orientation = session.get("games")[id]
+    orientation = session["games"][id]
 
     if not source:
         return jsonify({"error": "Source non fournie"}), 400
@@ -86,7 +89,7 @@ def get_moves():
     if piece.color != orientation:
         return jsonify({"error": "Pièce de la mauvaise couleur"})
 
-    moves = piece.get_moves(start_pos, chessboards[id].board)
+    moves = chessboards[id].get_moves(start_pos)
     moves_str = [position_to_string(pos) for pos in moves]
     print(moves_str)
     return jsonify({"moves": moves_str})
@@ -103,7 +106,7 @@ def move_piece():
     source = data.get("source")
     dest = data.get("destination")
     id = data.get("id")
-    orientation = session.get("games")[id]
+    orientation = session["games"][id]
 
     if not source or not dest:
         return jsonify({"error": "Position non fournies"}), 400

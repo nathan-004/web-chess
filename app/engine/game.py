@@ -107,7 +107,6 @@ class ChessBoard:
             return False
         
         turn = WHITE if len(self.moves) % 2 == 0 else BLACK
-        print(turn)
         if board[start_pos.y][start_pos.x].color != turn:
             return False
 
@@ -206,6 +205,22 @@ class ChessBoard:
             if len(self.moves) > 0:
                 move = self.moves.pop()
                 self.board[move.end_pos.y][move.end_pos.x], self.board[move.start_pos.y][move.start_pos.x] = None, self.board[move.end_pos.y][move.end_pos.x]
+
+    def get_moves(self, start_pos:Position, board:Optional[list[list[Optional[Piece]]]] = None) -> list[Position]:
+        """Retourne les coups possibles d'une pièce en vérifiant qu'il n'y ait pas d'échecs ou pas le bon tour"""
+        if board is None:
+            board = self.board
+        
+        if board[start_pos.y][start_pos.x] is None:
+            return []
+        
+        piece = board[start_pos.y][start_pos.x]
+        moves = []
+        for move in piece.get_moves(start_pos, board):
+            if self.valid_move(start_pos, move, board):
+                moves.append(move)
+        
+        return moves
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):
