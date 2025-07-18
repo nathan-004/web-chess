@@ -33,7 +33,7 @@ def init_session():
         print("Session existante", session)
         return jsonify({"message": "Session initialisée", "player": session["player"]})
     session["player"] = generate_username_uuid()
-    session["games"] = {}
+    session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
     return jsonify({"message": "Session initialisée", "player": session["player"]})
 
 
@@ -50,18 +50,17 @@ def game_page(game_id):
     if chessboards[game_id].players >= 2:
         return "<p>Trop de joueurs</p>"
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
-    logging.debug(games)
+
     if game_id not in games:
-        print(game_id, games)
         games[game_id] = orientation
         session["games"] = games
+        session.modified = True
         chessboards[game_id].players += 1
     else:
         orientation = session["games"][game_id]
-    logging.debug(games)
-    print(chessboards[game_id].players)
 
     return render_template('game.html', game_id=game_id, orientation=orientation)
+
 
 @app.route('/get_moves', methods=['POST'])
 def get_moves():
