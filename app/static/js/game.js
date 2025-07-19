@@ -27,7 +27,9 @@ async function startSession() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
-            }});
+            },
+        });
+    console.log("Session initialisée");
 }
 
 async function getMoves(source) {
@@ -117,6 +119,10 @@ function onDrop(source, target, piece, newPos, oldPos, orientation) {
     });
 }
 
+function onChange (oldPos, newPos) {
+    highlightPossibleMoves([]);
+}
+
 // ---------------------------------------------------------------------------
 // Config chessboard
 // ---------------------------------------------------------------------------
@@ -131,6 +137,7 @@ async function initBoard() {
         pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
         onDragStart: onDragStart,
         onDrop: onDrop,
+        onChange: onChange,
         orientation: "white",
     };
 
@@ -144,11 +151,12 @@ function main() {
         if (boardFEN != board.fen()) {
             board.position(boardFEN);
         }
-    }, 5000);
+    }, 500);
 }
 
 initBoard().then(instance => {
     board = instance;
+    currentPosition = board.fen();
     if (board.orientation() != playerOrientation) {
         board.flip();
     }
