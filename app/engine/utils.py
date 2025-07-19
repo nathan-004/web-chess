@@ -45,6 +45,9 @@ class Piece:
 
         return []
     
+    def special_moves(self, ):
+        return []
+    
     def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]) -> int:
         """
         Regarde si le coups est possible
