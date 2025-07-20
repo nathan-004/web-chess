@@ -6,7 +6,7 @@ class King(Piece):
         self.symbol = '\u2654' if color != WHITE else '\u265A'
         self.letter = "k"
 
-    def get_moves(self, pos: Position, board) -> list[Position]:
+    def get_moves(self, pos: Position, board) -> list[Move]:
         """
         Retourne les mouvements possibles de cette pièce sous forme de liste de tuples (x,y)
         ! Ne regarde pas si le coup met en échec !
@@ -25,7 +25,7 @@ class King(Piece):
                 new_pos = Position(pos.x + incr_x, pos.y + incr_y)
 
                 if self.is_valid_pos(pos, new_pos, board) <= self.VALID_LIMIT:
-                    moves.append(new_pos)
+                    moves.append(Move(self, pos, new_pos))
 
         return moves
     
@@ -78,7 +78,7 @@ class Queen(Piece):
         self.symbol = '\u2655' if color != WHITE else '\u265B'
         self.letter = "q"
 
-    def get_moves(self, pos: Position, board: list) -> list[Position]:
+    def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
         moves = []
 
@@ -86,12 +86,12 @@ class Queen(Piece):
             current_x, current_y = pos.x + incr.x, pos.y + incr.y
             valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             while valid == 0:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
                 current_x += incr.x
                 current_y += incr.y
                 valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             if valid == 1:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
 
         return moves
 
@@ -102,7 +102,7 @@ class Rook(Piece):
         self.symbol = '\u2656' if color != WHITE else '\u265C'
         self.letter = "r"
 
-    def get_moves(self, pos: Position, board: list) -> list[Position]:
+    def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
         moves = []
 
@@ -110,12 +110,12 @@ class Rook(Piece):
             current_x, current_y = pos.x + incr.x, pos.y + incr.y
             valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             while valid == 0:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
                 current_x += incr.x
                 current_y += incr.y
                 valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             if valid == 1:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
         
         return list(set(moves))
 
@@ -126,7 +126,7 @@ class Bishop(Piece):
         self.symbol = '\u2657' if color != WHITE else '\u265D'
         self.letter = "b"
 
-    def get_moves(self, pos: Position, board: list) -> list[Position]:
+    def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
         moves = []
 
@@ -134,12 +134,12 @@ class Bishop(Piece):
             current_x, current_y = pos.x + incr.x, pos.y + incr.y
             valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             while valid == 0:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
                 current_x += incr.x
                 current_y += incr.y
                 valid = self.is_valid_pos(pos, Position(current_x, current_y), board)
             if valid == 1:
-                moves.append(Position(current_x, current_y))
+                moves.append(Move(self, pos, Position(current_x, current_y)))
 
         return moves
 
@@ -149,7 +149,7 @@ class Knight(Piece):
         self.symbol = '\u2658' if color != WHITE else '\u265E'
         self.letter = "n"
 
-    def get_moves(self, pos: Position, board) -> list[Position]:
+    def get_moves(self, pos: Position, board) -> list[Move]:
         """        
         Retourne les mouvements possibles de cette pièce sous forme de liste de tuples (x,y)  
         ! Ne regarde pas si le coup met en échec !  
@@ -166,7 +166,7 @@ class Knight(Piece):
                 new_pos = Position(pos.x + dir[0] + move_x, pos.y + dir[1] + move_y)
                 
                 if self.is_valid_pos(pos, new_pos, board) <= self.VALID_LIMIT:
-                    moves.append(new_pos)
+                    moves.append(Move(self, pos, new_pos))
         
         return moves
 
@@ -177,7 +177,7 @@ class Pawn(Piece):
         self.letter = "p"
         self.direction = -1 if color == WHITE else 1
 
-    def get_moves(self, pos: Position, board) -> list[Position]:
+    def get_moves(self, pos: Position, board) -> list[Move]:
         """        
         Retourne les mouvements possibles de cette pièce sous forme de liste de tuples (x,y)  
         ! Ne regarde pas si le coup met en échec !  
@@ -194,7 +194,7 @@ class Pawn(Piece):
             valid = self.is_valid_pos(pos, new_pos, board)
             
             if valid == 0:
-                moves.append(new_pos)
+                moves.append(Move(self, pos, new_pos))
             if valid == 1 or valid == 4:
                 break
         
@@ -202,6 +202,6 @@ class Pawn(Piece):
             new_pos = Position(pos.x + incr_x, pos.y + self.direction)
             valid = self.is_valid_pos(pos, new_pos, board)
             if valid == 1:
-                moves.append(new_pos)
+                moves.append(Move(self, pos, new_pos))
 
         return moves

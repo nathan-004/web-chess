@@ -81,13 +81,12 @@ class Move(NamedTuple):
     start_pos:Position
     end_pos:Position
 
-class SpecialMove():
+class SpecialMove(Move):
     """Stocke les coups spéciaux, avec le coups et la représentation qui doit apparaître à l'échiquier"""
-
+    
 class Roque(SpecialMove):
     """Stocke les coups du roi et de la tour et le coup devant apparaître à l'échiquier"""
     def __init__(self, king_move:Move, rook_move:Move, direction:Optional[int] = None):
-        super().__init__()
         self.king_move = king_move
         self.rook_move = rook_move
         

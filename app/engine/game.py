@@ -51,7 +51,7 @@ class ChessBoard:
             self.board = board
         self.moves = [] # Liste de coups joués
 
-    def move(self, start_pos, end_pos, board:Optional[list[list]] = None) -> Optional[list[list]]:
+    def move(self, move:Move, board:Optional[list[list]] = None) -> Optional[list[list]]:
         """
         Modifie `self.board` si board n'est pas spécifié, sinon retourne l'échiquier avec le coup fait
 
@@ -65,49 +65,49 @@ class ChessBoard:
             board = self.board # Passage par référence pour faire des modifications
 
         # Vérifier si le coup est possible
-        if self.valid_move(Position(*start_pos), Position(*end_pos), board):
-            board[start_pos[1]][start_pos[0]], board[end_pos[1]][end_pos[0]] = None, board[start_pos[1]][start_pos[0]]
+        if self.valid_move(Position(*move.start_pos), Position(*move.end_pos), board):
+            board[move.start_pos[1]][move.start_pos[0]], board[move.end_pos[1]][move.end_pos[0]] = None, board[move.start_pos[1]][move.start_pos[0]]
             if board is self.board:
-                self.moves.append(Move(piece = board[end_pos[1]][end_pos[0]], start_pos=start_pos, end_pos=end_pos))
+                self.moves.append(move)
         else:
             return 1
 
         return board
 
-    def valid_move(self, start_pos: Position, end_pos: Position, board:Optional[list]=None):
+    def valid_move(self, move:Move, board:Optional[list]=None):
         """Vérifie si un coup peut être joué à partir des règles de mouvements dans les classes des pièces"""
-        if not (8 > start_pos.x >= 0):
+        if not (8 > move.start_pos.x >= 0):
             return False
-        if not (8 > start_pos.y >= 0):
+        if not (8 > move.start_pos.y >= 0):
             return False
 
-        if not (8 > end_pos.x >= 0):
+        if not (8 > move.end_pos.x >= 0):
             return False
-        if not (8 > end_pos.y >= 0):
+        if not (8 > move.end_pos.y >= 0):
             return False
 
         if board is None:
             board = self.board # Passage par référence, ne pas faire de modifications
 
-        if board[start_pos.y][start_pos.x] is None:
+        if board[move.start_pos.y][move.start_pos.x] is None:
             return False
 
         # Vérifier que la pièce tombe sur une pièce vide ou d'une couleur différente
-        if board[end_pos.y][end_pos.x] is not None:
-            if board[start_pos.y][start_pos.x].color == board[end_pos.y][end_pos.x].color:
+        if board[move.end_pos.y][move.end_pos.x] is not None:
+            if board[move.start_pos.y][move.start_pos.x].color == board[move.end_pos.y][move.end_pos.x].color:
                 return False
         
-        moves = board[start_pos.y][start_pos.x].get_moves(start_pos, board)
-        if not end_pos in moves:
+        moves = board[move.start_pos.y][move.start_pos.x].get_moves(move.start_pos, board)
+        if not move in moves:
             return False
         
         new_board = copy.deepcopy(board)
-        new_board[start_pos.y][start_pos.x], new_board[end_pos.y][end_pos.x] = None, new_board[start_pos.y][start_pos.x]
-        if self.is_check(color=board[start_pos.y][start_pos.x].color, board=new_board):
+        new_board[move.start_pos.y][move.start_pos.x], new_board[move.end_pos.y][move.end_pos.x] = None, new_board[move.start_pos.y][move.start_pos.x]
+        if self.is_check(color=board[move.start_pos.y][move.start_pos.x].color, board=new_board):
             return False
         
         turn = WHITE if len(self.moves) % 2 == 0 else BLACK
-        if board[start_pos.y][start_pos.x].color != turn:
+        if board[move.start_pos.y][move.start_pos.x].color != turn:
             return False
 
         return True
@@ -134,8 +134,8 @@ class ChessBoard:
             cur_king = board[pos_king.y][pos_king.x]
             for piece_type in self.PIECES:
                 moves = piece_type(cur_king.color).get_moves(pos_king, board)
-                for pos in moves:
-                    if isinstance(board[pos.y][pos.x], piece_type):
+                for move in moves:
+                    if isinstance(board[move.end_pos.y][move.end_pos.x], piece_type):
                         return True
         
         return False
@@ -163,13 +163,8 @@ class ChessBoard:
 
         # Vérifie que le roi ne peut plus bouger
         for king_pos in self.find_pieces(King, color, board):
-            for move in board[king_pos.y][king_pos.x].get_moves(king_pos, board):
-                new_board = self.move(king_pos, move, copy.deepcopy(board))
-                if new_board == 1: # Coups non valide
-                    continue
-
-                if not self.is_check(color, new_board):
-                    return False
+            if len(self.get_moves(king_pos, board)) != 0:
+                return False
                 
         # Vérifie qu'une pièce ne peut pas s'interposer
         for king_pos in self.find_pieces(King, color, board):
@@ -186,12 +181,10 @@ class ChessBoard:
                                 continue
                             elif piece.color != board[king_pos.y][king_pos.x].color:
                                 continue
-
-                            for piece_move in piece.get_moves(Position(x, y), board):
-                                new_board = self.move((x, y), (piece_move.x, piece_move.y), copy.deepcopy(board))
-                                if type(new_board) is list:
-                                    if not self.is_check(piece.color, new_board):
-                                        return False
+                            print(self.get_moves(Position(x, y), board))
+                            if len(self.get_moves(Position(x, y), board)) > 0:
+                                return False
+                            print(self.get_moves(Position(x, y), board), "test")
                                     
         return True # Si le roi est en échec, qu'il ne peut pas bouger, qu'aucune pièce ne peut se mettre au travers : echec et mats
     
@@ -217,7 +210,7 @@ class ChessBoard:
         piece = board[start_pos.y][start_pos.x]
         moves = []
         for move in piece.get_moves(start_pos, board):
-            if self.valid_move(start_pos, move, board):
+            if self.valid_move(move, board):
                 moves.append(move)
         
         return moves
