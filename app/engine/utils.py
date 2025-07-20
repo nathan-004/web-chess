@@ -80,3 +80,18 @@ class Move(NamedTuple):
     piece:Piece
     start_pos:Position
     end_pos:Position
+
+class SpecialMove():
+    """Stocke les coups spéciaux, avec le coups et la représentation qui doit apparaître à l'échiquier"""
+
+class Roque(SpecialMove):
+    """Stocke les coups du roi et de la tour et le coup devant apparaître à l'échiquier"""
+    def __init__(self, king_move:Move, rook_move:Move, direction:Optional[int] = None):
+        super().__init__()
+        self.king_move = king_move
+        self.rook_move = rook_move
+        
+        # Calculer la position devant apparaître sur l'échiquier
+        if direction is None:
+            direction = -1 if rook_move.start_pos.x == 0 else 1
+        self.move = Position(king_move.start_pos.x + 2 * direction, king_move.start_pos.y)

@@ -1,4 +1,4 @@
-from app.engine.utils import Position, Piece, WHITE, BLACK, Move
+from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque
 
 class King(Piece):
     def __init__(self, color):
@@ -29,7 +29,7 @@ class King(Piece):
 
         return moves
     
-    def special_moves(self, pos:Position, board) -> list[tuple[Move]]:
+    def special_moves(self, pos:Position, board) -> list[Roque]:
         """
         Retourne une liste de coups spéciaux : qui font intervenir plusieurs pièces
 
@@ -41,7 +41,7 @@ class King(Piece):
 
         Returns
         -------
-        list[tuple[Move]]: Liste de coups possibles
+        list[Roque]: Liste de coups possibles
         """
         if self.initial_position != pos:
             return []
@@ -62,15 +62,13 @@ class King(Piece):
             king_target = Position(6, pos.y)
             rook_start = Position(7, pos.y)
             rook_target = Position(5, pos.y)
-            moves.append((Move(self, pos, king_target, special="castling_kingside"),
-                        Move(board.get_piece(rook_start), rook_start, rook_target)))
+            moves.append(Roque(Move(self, pos, king_target), Move(board.board[pos.y][7], rook_start, rook_target), direction=-1))
    
         if can_castle(+1):
             king_target = Position(2, pos.y)
             rook_start = Position(0, pos.y)
             rook_target = Position(3, pos.y)
-            moves.append((Move(self, pos, king_target, special="castling_queenside"),
-                        Move(board.get_piece(rook_start), rook_start, rook_target)))
+            moves.append(Roque(Move(self, pos, king_target), Move(board.board[pos.y][0], rook_start, rook_target), direction=-1))
         
         return moves
 
