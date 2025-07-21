@@ -1,8 +1,12 @@
 from typing import Optional
 import copy
+import logging
 
+import app.utils.logger_config
 from app.engine.pieces import *
 from app.engine.utils import Position, Piece, WHITE, BLACK, Move, SpecialMove
+
+logger = logging.getLogger(app.utils.logger_config.APP_NAME)
 
 def blank_board() -> list[list]:
     """Retourne un échiquier vide"""
@@ -85,18 +89,22 @@ class ChessBoard:
         end_pos:tuple:(x,y)  
         board:list: échiquier, si non spécifié, modification de `self.board`  
         """
+        logger.debug(f"Appel de la fonction move avec {move}")
         is_self_board = board is None
         # Vérifier si le coup est possible
         move = self.valid_move(move, board)
+        logger.debug(f"Coups trouvé : {move}")
         if isinstance(move, Move):
-            print("ISINSTANCE")
+            logger.debug(f"{move} est une instance de Move")
             board = self.get_board(move, board)
-            if board is self.board:
+            if is_self_board:
+                logger.debug("Ajout du coups à self.moves")
                 self.moves.append(move)
         else:
             return 1
 
         if is_self_board:
+            logger.debug("Echiquier de la classe remplacé")
             self.board = board
 
         return board
@@ -112,11 +120,14 @@ class ChessBoard:
             return False
         if not (8 > move.end_pos.y >= 0):
             return False
+        
+        logger.debug(f"Coordonnées correctes : {move}")
 
         if board is None:
             board = self.board # Passage par référence, ne pas faire de modifications
 
         if board[move.start_pos.y][move.start_pos.x] is None:
+            logger.info("Tentative de bouger une case vide")
             return False
         
         start_piece = board[move.start_pos.y][move.start_pos.x]
@@ -125,10 +136,12 @@ class ChessBoard:
         # Vérifier que la pièce tombe sur une pièce vide ou d'une couleur différente
         if end_piece is not None:
             if start_piece.color == end_piece.color:
+                logger.info(f"La pièce tente de se déplacer sur une pièce de la même couleur")
                 return False
             
         turn = WHITE if len(self.moves) % 2 == 0 else BLACK
         if board[move.start_pos.y][move.start_pos.x].color != turn:
+            logger.info("Mauvais tours")
             return False
         
         moves = start_piece.get_moves(move.start_pos, board) + start_piece.special_moves(move.start_pos, self)
@@ -137,10 +150,12 @@ class ChessBoard:
                  move = piece_move
                  break
         else:
+            logger.info(f"Coups non trouvé dans {moves}")
             return False
         
         new_board = self.get_board(move, board)
         if self.is_check(color=start_piece.color, board=new_board):
+            logger.info("Echecs trouvé")
             return False
 
         return move

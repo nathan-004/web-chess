@@ -82,8 +82,10 @@ def test_castling_move():
     board.board[7][4] = King(WHITE, Position(4, 7))
     board.board[7][7] = Rook(WHITE, Position(7, 7))
 
-    moves = board.board[7][4].special_moves(Position(4, 7), board)
-    move = moves[0]
+    moves = board.get_moves(Position(4, 7))
+    print(moves)
+    move = moves[-1]
     
-    board.board = board.get_board(move)
+    board.board = board.move(move.pos)
     board.display()
+    a == 0

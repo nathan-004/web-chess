@@ -3,13 +3,14 @@ from collections import defaultdict
 import uuid
 import logging
 
+import app.utils.logger_config # Initialise le logger
 from app.engine.game import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string, Move
 from app.engine.utils import WHITE, BLACK
 
 ID_GAME_SIZE = 8
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(app.utils.logger_config.APP_NAME)
 app = Flask(__name__)
 app.secret_key = '5QuF6Rq9GQ'
 
@@ -30,7 +31,7 @@ chessboards = defaultdict(create_chessboard_instance)
 @app.route("/init_session", methods=["POST"])
 def init_session():
     if "player" in session:
-        print("Session existante", session)
+        logger.warning("Session déjà existante")
         return jsonify({"message": "Session initialisée", "player": session["player"]})
     session["player"] = generate_username_uuid()
     session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
@@ -90,7 +91,7 @@ def get_moves():
 
     moves = chessboards[id].get_moves(start_pos)
     moves_str = [position_to_string(move.pos) for move in moves]
-    print(moves_str)
+    logger.debug(f"Coups trouvés pour la pièce ({start_pos}) : {moves_str}")
     return jsonify({"moves": moves_str})
 
 @app.route('/move', methods=['POST'])
@@ -116,9 +117,8 @@ def move_piece():
     
     if chessboards[id].board[start_pos.y][start_pos.x].color != orientation:
         return jsonify({"error": "Pas la bonne pièce à jouer"}), 400
-    print(Move(chessboards[id].board[start_pos.y][start_pos.x], start_pos, end_pos))
     valid = chessboards[id].move(Move(chessboards[id].board[start_pos.y][start_pos.x], start_pos, end_pos))
-    print(not valid == 1)
+    logger.debug(f"Validation du coups : {not valid == 1}")
     return jsonify({"valid": not valid == 1})
 
 @app.route("/get_current_board", methods=["POST"])
@@ -128,7 +128,7 @@ def get_board():
     id = data.get("id")
 
     fen = board_to_fen(chessboards[id].board)
-    print(fen)
+    
     return jsonify({"board": fen})
 
 def main():
