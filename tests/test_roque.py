@@ -20,8 +20,6 @@ def test_white_kingside_castling():
     assert move is not None, "Roque côté roi blanc non détecté"
     assert move.king_move.end_pos == Position(6, 7)
     assert move.rook_move.end_pos == Position(5, 7)
-    a == 0
-
 
 def test_white_queenside_castling():
     board = ChessBoard(blank_board())
@@ -78,3 +76,14 @@ def test_white_kingside_castling_moved():
     moves = board.board[7][5].special_moves(Position(5, 7), board)
 
     assert len(moves) == 0, "Roques trouvés alors que le roi a bougé"
+
+def test_castling_move():
+    board = ConsoleChessboard(blank_board())
+    board.board[7][4] = King(WHITE, Position(4, 7))
+    board.board[7][7] = Rook(WHITE, Position(7, 7))
+
+    moves = board.board[7][4].special_moves(Position(4, 7), board)
+    move = moves[0]
+    
+    board.board = board.get_board(move)
+    board.display()

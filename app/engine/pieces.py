@@ -64,7 +64,7 @@ class King(Piece):
                 x += x_direction
             return False
 
-        if can_castle(-1):
+        if can_castle(+1):
             king_target = Position(6, pos.y)
             rook_start = Position(7, pos.y)
             rook_target = Position(5, pos.y)
@@ -73,11 +73,11 @@ class King(Piece):
                 Roque(
                     Move(self, pos, king_target),
                     Move(board.board[pos.y][7], rook_start, rook_target),
-                    -1
+                    +1
                 )
             )
 
-        if can_castle(+1):
+        if can_castle(-1):
             king_target = Position(2, pos.y)
             rook_start = Position(0, pos.y)
             rook_target = Position(3, pos.y)
@@ -86,7 +86,7 @@ class King(Piece):
                 Roque(
                     Move(self, pos, king_target),
                     Move(board.board[pos.y][0], rook_start, rook_target),
-                    1
+                    -1
                 )
             )
         

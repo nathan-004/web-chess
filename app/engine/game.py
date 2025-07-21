@@ -2,7 +2,7 @@ from typing import Optional
 import copy
 
 from app.engine.pieces import *
-from app.engine.utils import Position, Piece, WHITE, BLACK, Move
+from app.engine.utils import Position, Piece, WHITE, BLACK, Move, SpecialMove
 
 def blank_board() -> list[list]:
     """Retourne un échiquier vide"""
@@ -85,16 +85,19 @@ class ChessBoard:
         end_pos:tuple:(x,y)  
         board:list: échiquier, si non spécifié, modification de `self.board`  
         """
-        if board is None:
-            board = self.board # Passage par référence pour faire des modifications
-
+        is_self_board = board is None
         # Vérifier si le coup est possible
-        if self.valid_move(move, board):
-            board[move.start_pos[1]][move.start_pos[0]], board[move.end_pos[1]][move.end_pos[0]] = None, board[move.start_pos[1]][move.start_pos[0]]
+        move = self.valid_move(move, board)
+        if isinstance(move, Move):
+            print("ISINSTANCE")
+            board = self.get_board(move, board)
             if board is self.board:
                 self.moves.append(move)
         else:
             return 1
+
+        if is_self_board:
+            self.board = board
 
         return board
 
@@ -115,26 +118,32 @@ class ChessBoard:
 
         if board[move.start_pos.y][move.start_pos.x] is None:
             return False
+        
+        start_piece = board[move.start_pos.y][move.start_pos.x]
+        end_piece = board[move.end_pos.y][move.end_pos.x]
 
         # Vérifier que la pièce tombe sur une pièce vide ou d'une couleur différente
-        if board[move.end_pos.y][move.end_pos.x] is not None:
-            if board[move.start_pos.y][move.start_pos.x].color == board[move.end_pos.y][move.end_pos.x].color:
+        if end_piece is not None:
+            if start_piece.color == end_piece.color:
                 return False
-        
-        moves = board[move.start_pos.y][move.start_pos.x].get_moves(move.start_pos, board)
-        if not move in moves:
-            return False
-        
-        new_board = copy.deepcopy(board)
-        new_board[move.start_pos.y][move.start_pos.x], new_board[move.end_pos.y][move.end_pos.x] = None, new_board[move.start_pos.y][move.start_pos.x]
-        if self.is_check(color=board[move.start_pos.y][move.start_pos.x].color, board=new_board):
-            return False
-        
+            
         turn = WHITE if len(self.moves) % 2 == 0 else BLACK
         if board[move.start_pos.y][move.start_pos.x].color != turn:
             return False
+        
+        moves = start_piece.get_moves(move.start_pos, board) + start_piece.special_moves(move.start_pos, self)
+        for piece_move in moves:
+            if piece_move.pos == move.pos:
+                 move = piece_move
+                 break
+        else:
+            return False
+        
+        new_board = self.get_board(move, board)
+        if self.is_check(color=start_piece.color, board=new_board):
+            return False
 
-        return True
+        return move
     
     def is_check(self, color: Optional[str] = None, board: Optional[list[list]] = None):
         """
@@ -234,12 +243,27 @@ class ChessBoard:
         piece = board[start_pos.y][start_pos.x]
         moves = []
         for move in piece.get_moves(start_pos, board):
-            if self.valid_move(move, board):
+            if isinstance(self.valid_move(move, board), Move):
                 moves.append(move)
         
         moves.extend(piece.special_moves(start_pos, self))
-        print(piece.special_moves(start_pos, self))
         return moves
+    
+    def get_board(self, move:Move, board:Optional[list] = None) -> Optional[list]:
+        """Retourne le coup réalisé sans vérification préalable"""
+        if board is None:
+            board = self.board
+        else:
+            board = copy.deepcopy(board) # Préviens le passage par référence
+
+        if isinstance(move, SpecialMove):
+            if isinstance(move, Roque):
+                board = self.get_board(move.king_move, board)
+                board = self.get_board(move.rook_move, board)
+            return board 
+        else:
+            board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
+            return board
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):
