@@ -275,19 +275,19 @@ class ConsoleChessboard(ChessBoard):
         assert 8 > xx >= 0, "La position X donnée n'est pas valide"
         assert 8 > yy >= 0, "La position Y donnée n'est pas valide"
 
-        moves = board[yy][xx].get_moves(Position(xx,yy), board)
+        moves = self.get_moves(Position(xx, yy), board)
+
+        move_positions = {move.pos for move in moves}
 
         for y, row in enumerate(board):
-            # print(f"\n{'-' * 24}")
             print("")
             for x, piece in enumerate(row):
                 if x == xx and y == yy:
                     print(f"\033[31m{piece.symbol}\033[0m", end=" |")
-                elif (x,y) not in moves:
-                    print(piece.symbol if piece is not None else " ", end=" |")
-                else:
+                elif Position(x, y) in move_positions:
                     print("#", end=" |")
-        
+                else:
+                    print(piece.symbol if piece is not None else " ", end=" |")
         print("")
 
     def play(self):
