@@ -4,7 +4,7 @@ import uuid
 import logging
 
 from app.engine.game import ChessBoard, board_to_fen
-from app.engine.utils import string_to_position, position_to_string
+from app.engine.utils import string_to_position, position_to_string, Move
 from app.engine.utils import WHITE, BLACK
 
 ID_GAME_SIZE = 8
@@ -89,7 +89,7 @@ def get_moves():
         return jsonify({"error": "Pièce de la mauvaise couleur"})
 
     moves = chessboards[id].get_moves(start_pos)
-    moves_str = [position_to_string(pos) for pos in moves]
+    moves_str = [position_to_string(move.end_pos) for move in moves]
     print(moves_str)
     return jsonify({"moves": moves_str})
 
@@ -116,8 +116,8 @@ def move_piece():
     
     if chessboards[id].board[start_pos.y][start_pos.x].color != orientation:
         return jsonify({"error": "Pas la bonne pièce à jouer"}), 400
-    
-    valid = chessboards[id].move(start_pos, end_pos)
+    print(Move(chessboards[id].board[start_pos.y][start_pos.x], start_pos, end_pos))
+    valid = chessboards[id].move(Move(chessboards[id].board[start_pos.y][start_pos.x], start_pos, end_pos))
     print(not valid == 1)
     return jsonify({"valid": not valid == 1})
 

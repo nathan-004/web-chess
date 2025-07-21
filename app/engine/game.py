@@ -65,7 +65,7 @@ class ChessBoard:
             board = self.board # Passage par référence pour faire des modifications
 
         # Vérifier si le coup est possible
-        if self.valid_move(Position(*move.start_pos), Position(*move.end_pos), board):
+        if self.valid_move(move, board):
             board[move.start_pos[1]][move.start_pos[0]], board[move.end_pos[1]][move.end_pos[0]] = None, board[move.start_pos[1]][move.start_pos[0]]
             if board is self.board:
                 self.moves.append(move)
