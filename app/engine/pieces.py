@@ -1,10 +1,11 @@
 from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque
 
 class King(Piece):
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2654' if color != WHITE else '\u265A'
         self.letter = "k"
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list[Move]:
         """
@@ -50,34 +51,53 @@ class King(Piece):
         row = 7 if self.color == WHITE else 0
         moves = []
 
-        def can_castle(x_direction:int):
-            x = pos.x
-            piece = board.board[pos.y][x]
-            while piece is None and not(0 <= x < 8):
-                if piece is Rook and piece.initial_position == Position(x, pos.y):
-                    return True
+        def can_castle(x_direction: int) -> bool:
+            x = pos.x + x_direction
+
+            while 0 <= x < 8:
+                piece = board.board[pos.y][x]
+                if piece is not None:
+                    if isinstance(piece, Rook) and not piece.has_moved and piece.color == self.color:
+                        return True
+                    else:
+                        return False
                 x += x_direction
             return False
-        
-        if can_castle(-1):
+
+        if can_castle(+1):
             king_target = Position(6, pos.y)
             rook_start = Position(7, pos.y)
             rook_target = Position(5, pos.y)
-            moves.append(Roque(Move(self, pos, king_target), Move(board.board[pos.y][7], rook_start, rook_target), direction=-1))
-   
-        if can_castle(+1):
+
+            moves.append(
+                Roque(
+                    Move(self, pos, king_target),
+                    Move(board.board[pos.y][7], rook_start, rook_target),
+                    -1
+                )
+            )
+
+        if can_castle(-1):
             king_target = Position(2, pos.y)
             rook_start = Position(0, pos.y)
             rook_target = Position(3, pos.y)
-            moves.append(Roque(Move(self, pos, king_target), Move(board.board[pos.y][0], rook_start, rook_target), direction=-1))
+
+            moves.append(
+                Roque(
+                    Move(self, pos, king_target),
+                    Move(board.board[pos.y][0], rook_start, rook_target),
+                    1
+                )
+            )
         
         return moves
 
 class Queen(Piece):
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2655' if color != WHITE else '\u265B'
         self.letter = "q"
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
@@ -98,10 +118,11 @@ class Queen(Piece):
 
 class Rook(Piece):
     ROOK_DIRECTIONS = [Position(-1, 0), Position(1, 0), Position(0, -1), Position(0, 1)]
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2656' if color != WHITE else '\u265C'
         self.letter = "r"
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
@@ -122,10 +143,11 @@ class Rook(Piece):
 
 class Bishop(Piece):
     BISHOP_DIRECTIONS = [Position(1, 1), Position(1, -1), Position(-1, -1), Position(-1, 1)]
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2657' if color != WHITE else '\u265D'
         self.letter = "b"
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
         super().get_moves(pos, board)
@@ -145,10 +167,11 @@ class Bishop(Piece):
         return moves
 
 class Knight(Piece):
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2658' if color != WHITE else '\u265E'
         self.letter = "n"
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list[Move]:
         """        
@@ -172,11 +195,12 @@ class Knight(Piece):
         return moves
 
 class Pawn(Piece):
-    def __init__(self, color):
+    def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2659' if color != WHITE else '\u265F'
         self.letter = "p"
         self.direction = -1 if color == WHITE else 1
+        self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list[Move]:
         """        

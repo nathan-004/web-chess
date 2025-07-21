@@ -12,11 +12,35 @@ def start_board() -> list[list]:
     """Retourne la configuration de départ"""
     board = [[None for _ in range(8)] for _ in range(8)]
 
-    board[0] = [Rook(BLACK), Knight(BLACK), Bishop(BLACK), Queen(BLACK), King(BLACK), Bishop(BLACK), Knight(BLACK), Rook(BLACK)]
-    board[1] = [Pawn(BLACK) for _ in range(8)]
+    # Pièces noires (ligne 0)
+    board[0] = [
+        Rook(BLACK, Position(0, 0)), 
+        Knight(BLACK, Position(1, 0)), 
+        Bishop(BLACK, Position(2, 0)), 
+        Queen(BLACK, Position(3, 0)), 
+        King(BLACK, Position(4, 0)), 
+        Bishop(BLACK, Position(5, 0)), 
+        Knight(BLACK, Position(6, 0)), 
+        Rook(BLACK, Position(7, 0))
+    ]
+    
+    # Pions noirs (ligne 1)
+    board[1] = [Pawn(BLACK, Position(x, 1)) for x in range(8)]
 
-    board[-1] = [Rook(WHITE), Knight(WHITE), Bishop(WHITE), Queen(WHITE), King(WHITE), Bishop(WHITE), Knight(WHITE), Rook(WHITE)]
-    board[-2] = [Pawn(WHITE) for _ in range(8)]
+    # Pièces blanches (ligne 7)
+    board[-1] = [
+        Rook(WHITE, Position(0, 7)), 
+        Knight(WHITE, Position(1, 7)), 
+        Bishop(WHITE, Position(2, 7)), 
+        Queen(WHITE, Position(3, 7)), 
+        King(WHITE, Position(4, 7)), 
+        Bishop(WHITE, Position(5, 7)), 
+        Knight(WHITE, Position(6, 7)), 
+        Rook(WHITE, Position(7, 7))
+    ]
+    
+    # Pions blancs (ligne 6)
+    board[-2] = [Pawn(WHITE, Position(x, 6)) for x in range(8)]
 
     return board
 
@@ -133,7 +157,7 @@ class ChessBoard:
         for pos_king in kings:
             cur_king = board[pos_king.y][pos_king.x]
             for piece_type in self.PIECES:
-                moves = piece_type(cur_king.color).get_moves(pos_king, board)
+                moves = piece_type(cur_king.color, Position(0, 0)).get_moves(pos_king, board)
                 for move in moves:
                     if isinstance(board[move.end_pos.y][move.end_pos.x], piece_type):
                         return True

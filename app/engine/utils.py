@@ -38,17 +38,18 @@ class Piece:
         self.symbol = " "
         self.moves = []
         self.initial_position = initial_position
+        self.has_moved = False
 
     def get_moves(self, pos: Position, board) -> list:
-        if self.initial_position is None:
-            self.initial_position = pos
+        if self.initial_position != pos:
+            self.has_moved = True
 
         return []
     
     def special_moves(self, pos:Position, board) -> list:
-        if self.initial_position is None:
-            self.initial_position = pos
-            
+        if self.initial_position != pos:
+            self.has_moved = True
+
         return []
     
     def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]) -> int:
