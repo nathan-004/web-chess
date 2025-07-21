@@ -213,6 +213,8 @@ class ChessBoard:
             if self.valid_move(move, board):
                 moves.append(move)
         
+        moves.extend(piece.special_moves(start_pos, self))
+        print(piece.special_moves(start_pos, self))
         return moves
 
 # ------------------------ Partie dans la console ------------------------

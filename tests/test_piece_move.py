@@ -1,5 +1,5 @@
 from app.engine.game import *
-from app.engine.utils import Move
+from app.engine.utils import Move, SpecialMove
 
 def test_king_moves():
     b = blank_board()

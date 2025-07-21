@@ -45,7 +45,10 @@ class Piece:
 
         return []
     
-    def special_moves(self, ):
+    def special_moves(self, pos:Position, board) -> list:
+        if self.initial_position is None:
+            self.initial_position = pos
+            
         return []
     
     def is_valid_pos(self, initial_pos: Position, new_pos: Position, board: list[list]) -> int:
@@ -81,6 +84,10 @@ class Move(NamedTuple):
     start_pos:Position
     end_pos:Position
 
+    @property
+    def pos(self):
+        return self.end_pos
+
 class SpecialMove(Move):
     """Stocke les coups spéciaux, avec le coups et la représentation qui doit apparaître à l'échiquier"""
     
@@ -94,3 +101,7 @@ class Roque(SpecialMove):
         if direction is None:
             direction = -1 if rook_move.start_pos.x == 0 else 1
         self.move = Position(king_move.start_pos.x + 2 * direction, king_move.start_pos.y)
+
+    @property
+    def pos(self):
+        return self.move

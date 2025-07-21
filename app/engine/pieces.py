@@ -43,6 +43,7 @@ class King(Piece):
         -------
         list[Roque]: Liste de coups possibles
         """
+        super().special_moves(pos, board)
         if self.initial_position != pos:
             return []
         

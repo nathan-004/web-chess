@@ -89,7 +89,7 @@ def get_moves():
         return jsonify({"error": "Pièce de la mauvaise couleur"})
 
     moves = chessboards[id].get_moves(start_pos)
-    moves_str = [position_to_string(move.end_pos) for move in moves]
+    moves_str = [position_to_string(move.pos) for move in moves]
     print(moves_str)
     return jsonify({"moves": moves_str})
 
