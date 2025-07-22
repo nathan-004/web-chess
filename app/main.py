@@ -133,3 +133,11 @@ def get_board():
 
 def main():
     app.run(host="0.0.0.0", debug=True)
+
+@app.route("/get_turn", methods=["POST"])
+def get_turn():
+    """Retourne la couleur du joueur qui doit jouer"""
+    data = request.get_json()
+    id = data.get("id")
+
+    return jsonify({"turn": WHITE if len(chessboards[id].moves) % 2 == 0 else BLACK})

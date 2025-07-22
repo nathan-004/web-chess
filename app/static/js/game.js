@@ -18,6 +18,12 @@ function highlightPossibleMoves(squares) {
     });
 }
 
+function changeTextById(elementID, text) {
+    const element = document.getElementById(elementID);
+    element.innerHTML = text;
+    console.log(text);
+}
+
 // ---------------------------------------------------------------------------
 // Chess Util Functions -> Server
 // ---------------------------------------------------------------------------
@@ -97,6 +103,24 @@ async function getBoard() {
     return data.board;
 }
 
+async function getCurrentTurn() {
+    const response = await fetch('/get_turn', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: id  // Assure-toi que la variable `id` existe dans le contexte
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.turn;
+}
 
 // ---------------------------------------------------------------------------
 // Events Functions
@@ -130,6 +154,7 @@ function onChange (oldPos, newPos) {
 async function initBoard() {
     await startSession();
     const boardFEN = await getBoard();
+    const turn = await getCurrentTurn();
     
     const config = {
         draggable: true,
@@ -141,17 +166,21 @@ async function initBoard() {
         orientation: "white",
     };
 
+    changeTextById("turn", turn);
+
     return Chessboard('board', config);
 }
 
 function main() {
     setInterval(async function () {
         const boardFEN = await getBoard();
-        console.log(boardFEN);
+        const turn = await getCurrentTurn();
+
         if (boardFEN != board.fen()) {
+            changeTextById("turn", turn);
             board.position(boardFEN);
         }
-    }, 10000);
+    }, 500);
 }
 
 initBoard().then(instance => {

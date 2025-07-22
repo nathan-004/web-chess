@@ -4,17 +4,21 @@
   <meta charset="UTF-8">
   <title>Chessboard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/chessboard.css') }}">
-  <style>
-    #board {
-      width: 30%;
-      margin: auto;
-    }
-  </style>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/game.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!--Chessboard.js requirements-->
 </head>
 <body>
-
-  <div id="board"></div>
+  <main>
+    <div class="board-container">
+      <div id="board"></div>
+    </div>
+    <div class="infos-container">
+      <h2>Informations</h2>
+      <p>Joueur: {{ orientation }}</p>
+      <p>Statut: En attente</p>
+      <p>Turn: <span id="turn">NaN</span></p>
+    </div>
+  </main>
 
   <script>
     const id = "{{ game_id }}";
