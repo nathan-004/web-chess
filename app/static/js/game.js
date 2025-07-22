@@ -135,16 +135,21 @@ function onDragStart(source, piece, position, orientation) {
     });
 }
 
-function onDrop(source, target, piece, newPos, oldPos, orientation) {
-    movePiece(source, target).then(valid => {
-        if (!valid) {
-            board.position(oldPos);
-        }
-    });
+async function onDrop(source, target, piece, newPos, oldPos, orientation) {
+    valid = await movePiece(source, target);
+
+    if (!valid) {
+        board.position(oldPos);
+    }
+    const turn = await getCurrentTurn();
+    changeTextById("turn", turn);
 }
 
-function onChange (oldPos, newPos) {
+async function onChange (oldPos, newPos) {
     highlightPossibleMoves([]);
+    const turn = await getCurrentTurn();
+            
+    changeTextById("turn", turn);
 }
 
 // ---------------------------------------------------------------------------
@@ -174,10 +179,8 @@ async function initBoard() {
 function main() {
     setInterval(async function () {
         const boardFEN = await getBoard();
-        const turn = await getCurrentTurn();
 
         if (boardFEN != board.fen()) {
-            changeTextById("turn", turn);
             board.position(boardFEN);
         }
     }, 500);
