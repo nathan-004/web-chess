@@ -160,6 +160,28 @@ class ChessBoard:
 
         return move
     
+    def get_attackers(self, pos:Position, board:Optional[list] = None) -> list[Piece]:
+        """Retourne les pièces qui attaquent la pièce à la position donnée"""
+        logger.debug("Appel de la fonction get_attackers")
+        if board is None:
+            board = self.board
+
+        piece = board[pos.y][pos.x]
+
+        if piece is None:
+            logger.warning("La position donnée ne correspond pas à une pièce")
+            return []
+        
+        attackers = []
+        for piece_type in self.PIECES:
+            moves = piece_type(piece.color, Position(0, 0)).get_moves(pos, board)
+            for move in moves:
+                if isinstance(board[move.end_pos.y][move.end_pos.x], piece_type):
+                    attackers.append(board[move.end_pos.y][move.end_pos.x])
+                    break
+        
+        return attackers
+
     def is_check(self, color: Optional[str] = None, board: Optional[list[list]] = None):
         """
         Regarde si le roi est en échecs en regardant si les trajectoires des pièces adverses le touchent
@@ -179,13 +201,8 @@ class ChessBoard:
         kings = self.find_pieces(King, color, board)
 
         for pos_king in kings:
-            cur_king = board[pos_king.y][pos_king.x]
-            for piece_type in self.PIECES:
-                moves = piece_type(cur_king.color, Position(0, 0)).get_moves(pos_king, board)
-                for move in moves:
-                    if isinstance(board[move.end_pos.y][move.end_pos.x], piece_type):
-                        return True
-        
+            if len(self.get_attackers(pos_king, board)) > 0:
+                return True
         return False
 
     def find_pieces(self, piece_type: Piece, color: Optional[str] = None, board: Optional[list[list]] = None) -> list[Position]:
@@ -229,10 +246,8 @@ class ChessBoard:
                                 continue
                             elif piece.color != board[king_pos.y][king_pos.x].color:
                                 continue
-                            print(self.get_moves(Position(x, y), board))
                             if len(self.get_moves(Position(x, y), board)) > 0:
                                 return False
-                            print(self.get_moves(Position(x, y), board), "test")
                                     
         return True # Si le roi est en échec, qu'il ne peut pas bouger, qu'aucune pièce ne peut se mettre au travers : echec et mats
     
