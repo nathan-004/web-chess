@@ -86,6 +86,5 @@ def test_castling_move():
     print(moves)
     move = moves[-1]
     
-    board.board = board.move(move.pos)
+    board.board = board.move(move.king_move)
     board.display()
-    a == 0
