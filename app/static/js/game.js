@@ -183,7 +183,7 @@ function main() {
         if (boardFEN != board.fen()) {
             board.position(boardFEN);
         }
-    }, 5000);
+    }, 500);
 }
 
 initBoard().then(instance => {

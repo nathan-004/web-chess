@@ -125,13 +125,21 @@ def move_piece():
 
 @app.route("/get_current_board", methods=["POST"])
 def get_board():
-    """Retourne l'échiquier en notation fen"""
+    """
+    Retourne
+    --------
+    `board`: str
+        échiquier sous forme de notation FEN
+    `board_state`: string
+        Retourne l'état de l'échiquier -> echec, echec et mats, pat, none
+    """
     data = request.get_json()
     id = data.get("id")
 
     fen = board_to_fen(chessboards[id].board)
+    state = chessboards[id].get_state()
     
-    return jsonify({"board": fen})
+    return jsonify({"board": fen, "board_state": state})
 
 def main():
     app.run(host="0.0.0.0", debug=True)

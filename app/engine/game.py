@@ -5,6 +5,7 @@ import logging
 import app.utils.logger_config
 from app.engine.pieces import *
 from app.engine.utils import Position, Piece, WHITE, BLACK, Move, SpecialMove
+from app.utils.constants import CHECKMATE, CHECK, NONE, PAT
 
 logger = logging.getLogger(app.utils.logger_config.APP_NAME)
 
@@ -294,6 +295,22 @@ class ChessBoard:
         else:
             board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
             return board
+        
+    def is_stalemate(self, board:Optional[list[list[Optional[Piece]]]] = None, color = None) -> bool:
+        """Renvoie True si l'échiquier renvoyé correspond à une situation de pat"""
+        if board is None:
+            board = self.board
+        
+        for piece_type in self.PIECES:
+            for piece_pos in self.find_pieces(piece_type, color, board):
+                if len(self.get_moves(piece_pos)) > 0:
+                    return False
+        
+        return True
+    
+    def get_state(self, board:Optional[list] = None) -> str:
+        """Retourne le status de la partie"""
+        return NONE
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):
