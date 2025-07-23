@@ -30,6 +30,7 @@ chessboards = defaultdict(create_chessboard_instance)
 
 @app.route("/init_session", methods=["POST"])
 def init_session():
+    logger.warning(session)
     if "player" in session:
         logger.warning("Session déjà existante")
         return jsonify({"message": "Session initialisée", "player": session["player"]})
@@ -47,8 +48,9 @@ def create_chessboard():
 @app.route('/game/<game_id>')
 def game_page(game_id):
     games = session.get("games", {})
+    logger.warning(games)
 
-    if chessboards[game_id].players >= 2:
+    if chessboards[game_id].players >= 2 and game_id not in games:
         return "<p>Trop de joueurs</p>"
     orientation = WHITE if chessboards[game_id].players == 0 else BLACK
 
