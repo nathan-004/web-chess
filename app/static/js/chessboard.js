@@ -50,7 +50,8 @@
   CSS['sparePiecesTop'] = 'spare-pieces-top-4028b'
   CSS['square'] = 'square-55d63'
   CSS['white'] = 'white-1e1d7'
-  CSS['highlightMove1'] = 'move-square'
+  CSS['highlightMove'] = 'move-square'
+  CSS['highlightMovePiece'] = 'piece-move-square'
 
   // ---------------------------------------------------------------------------
   // Misc Util Functions

@@ -6,14 +6,22 @@
 function highlightPossibleMoves(squares) {
     // Enlève les anciens coups possibles
     document.querySelectorAll("." + CSS.square).forEach(square => {
-        square.classList.remove(CSS.highlightMove1);
+        square.classList.remove(CSS.highlightMove);
+        square.classList.remove(CSS.highlightMovePiece);
     });
+
+    const position = board.position();
 
     // Ajoute les nouveaux
     squares.forEach(sq => {
         const squareEl = document.querySelector(`.square-${sq}`);
         if (squareEl) {
-            squareEl.classList.add(CSS.highlightMove1);
+            if (position.hasOwnProperty(sq)) {
+                squareEl.classList.add(CSS.highlightMovePiece);
+            }
+            else {
+                squareEl.classList.add(CSS.highlightMove); // CSS depuis chessboard.js
+            }
         }
     });
 }
@@ -147,6 +155,7 @@ async function onDrop(source, target, piece, newPos, oldPos, orientation) {
 
 async function onChange (oldPos, newPos) {
     highlightPossibleMoves([]);
+    console.log("test");
     const turn = await getCurrentTurn();
             
     changeTextById("turn", turn);

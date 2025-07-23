@@ -65,3 +65,17 @@
   z-index: 10;
   border-radius: 100%;
 }
+
+.piece-move-square::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 65%;
+  height: 65%;
+  background-color: transparent;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 100%;
+  border: 10px solid rgba(0, 128, 0, 0.37);
+}
