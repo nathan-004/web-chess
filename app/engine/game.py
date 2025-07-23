@@ -219,7 +219,7 @@ class ChessBoard:
             
         return positions
     
-    def is_checkmate(self, color:str, board: Optional[list[list]]) -> bool:
+    def is_checkmate(self, color:str = None, board: Optional[list[list]] = None) -> bool:
         """Vérifie si le roi de la couleur donnée est échec et mat"""
         if board is None:
             board = copy.deepcopy(self.board)
@@ -310,6 +310,13 @@ class ChessBoard:
     
     def get_state(self, board:Optional[list] = None) -> str:
         """Retourne le status de la partie"""
+        if self.is_check():
+            if self.is_checkmate():
+                return CHECKMATE
+            return CHECK
+        elif self.is_stalemate():
+            return PAT
+
         return NONE
 
 # ------------------------ Partie dans la console ------------------------

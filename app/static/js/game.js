@@ -100,7 +100,7 @@ async function getBoard() {
     }
 
     const data = await response.json();
-    return data.board;
+    return data;
 }
 
 async function getCurrentTurn() {
@@ -163,7 +163,7 @@ async function initBoard() {
     
     const config = {
         draggable: true,
-        position: boardFEN,
+        position: boardFEN.board,
         pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
         onDragStart: onDragStart,
         onDrop: onDrop,
@@ -180,11 +180,17 @@ function main() {
     setInterval(async function () {
         const boardFEN = await getBoard();
 
-        if (boardFEN != board.fen()) {
-            board.position(boardFEN);
+        if (boardFEN.board != board.fen()) {
+            board.position(boardFEN.board);
         }
+        if (boardFEN.board_state != currentStatus) {
+            changeTextById("status", boardFEN.board_state);
+        }
+
     }, 500);
 }
+
+let currentStatus = "NaN";
 
 initBoard().then(instance => {
     board = instance;
