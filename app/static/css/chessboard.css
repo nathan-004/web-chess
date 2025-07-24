@@ -1,5 +1,9 @@
 /*! chessboard.js v@VERSION | (c) 2019 Chris Oakman | MIT License chessboardjs.com/license */
 
+:root {
+  --move-color: rgba(0, 128, 0, 0.5);
+}
+
 .clearfix-7da63 {
   clear: both;
 }
@@ -60,7 +64,7 @@
   left: 17.5%;
   width: 65%;
   height: 65%;
-  background-color: rgba(0, 128, 0, 0.5);
+  background-color: var(--move-color);
   pointer-events: none;
   z-index: 10;
   border-radius: 100%;
@@ -77,5 +81,5 @@
   pointer-events: none;
   z-index: 10;
   border-radius: 100%;
-  border: 10px solid rgba(0, 128, 0, 0.37);
+  border: 10px solid var(--move-color);
 }

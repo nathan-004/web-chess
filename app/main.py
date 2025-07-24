@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request, jsonify, session
+from flask import redirect, url_for
+
 from collections import defaultdict
 import uuid
 import logging
@@ -20,21 +22,25 @@ app.secret_key = '5QuF6Rq9GQ'
 
 def create_chessboard_instance():
     board = ChessBoard()
-    board.players = 0
+    board.players = []
     return board
 
 def generate_username_uuid():
     return f"user_{str(uuid.uuid4())[:8]}"
 
 chessboards = defaultdict(create_chessboard_instance)
+players = set()
 
 @app.route("/init_session", methods=["POST"])
 def init_session():
-    logger.warning(session)
+    username = request.form["username"]
+    player = generate_username_uuid()
     if "player" in session:
-        logger.warning("Session déjà existante")
-        return jsonify({"message": "Session initialisée", "player": session["player"]})
-    session["player"] = generate_username_uuid()
+        player = session["player"]
+    if username:
+        if not username in players:
+            player = username
+    session["player"] = player
     session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
     return jsonify({"message": "Session initialisée", "player": session["player"]})
 
@@ -45,25 +51,44 @@ def create_chessboard():
     chessboards[id] = create_chessboard_instance()
     return jsonify({"id": id})
 
+# ---------------------------------------------------------------------------
+# Menu
+# ---------------------------------------------------------------------------
+
+@app.route("/")
+def home():
+    return render_template('index.html')
+
+# ---------------------------------------------------------------------------
+# Création du jeu                                                    |
+# ---------------------------------------------------------------------------
+
 @app.route('/game/<game_id>')
 def game_page(game_id):
+    if not "player" in session:
+        return redirect(url_for("home"))
+    
     games = session.get("games", {})
+    player = session.get("player")
     logger.warning(games)
 
-    if chessboards[game_id].players >= 2 and game_id not in games:
+    if len(chessboards[game_id].players) >= 2 and game_id not in games:
         return "<p>Trop de joueurs</p>"
-    orientation = WHITE if chessboards[game_id].players == 0 else BLACK
+    orientation = WHITE if len(chessboards[game_id].players) else BLACK
 
     if game_id not in games:
         games[game_id] = orientation
         session["games"] = games
         session.modified = True
-        chessboards[game_id].players += 1
+        chessboards[game_id].players.append(player)
     else:
         orientation = session["games"][game_id]
 
     return render_template('game.html', game_id=game_id, orientation=orientation)
 
+# ---------------------------------------------------------------------------
+# Logique de jeu
+# ---------------------------------------------------------------------------
 
 @app.route('/get_moves', methods=['POST'])
 def get_moves():
@@ -138,11 +163,9 @@ def get_board():
 
     fen = board_to_fen(chessboards[id].board)
     state = chessboards[id].get_state()
+    players = chessboards[id].players
     
-    return jsonify({"board": fen, "board_state": state})
-
-def main():
-    app.run(host="0.0.0.0", debug=True)
+    return jsonify({"board": fen, "board_state": state, "players": players})
 
 @app.route("/get_turn", methods=["POST"])
 def get_turn():
@@ -151,3 +174,6 @@ def get_turn():
     id = data.get("id")
 
     return jsonify({"turn": WHITE if len(chessboards[id].moves) % 2 == 0 else BLACK})
+
+def main():
+    app.run(host="0.0.0.0", debug=True)

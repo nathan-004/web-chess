@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Créer une Partie d'Échecs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+  <main>
+    <h1>Nouvelle Partie</h1>
+    <form id="start-form" method="post" action="/init_session">
+      <label for="username">Nom d'utilisateur :</label>
+      <input type="text" id="username" name="username">
+      <button type="submit">Sauvegarder</button>
+    </form>
+  </main>
+</body>

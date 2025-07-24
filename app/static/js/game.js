@@ -181,6 +181,14 @@ async function initBoard() {
     };
 
     changeTextById("turn", turn);
+    if (playerOrientation == "white") {
+        changeTextById("currentPlayer", boardFEN.players[0]);
+        changeTextById("secondPlayer", boardFEN.players[1]);
+    }
+    else {
+        changeTextById("currentPlayer", boardFEN.players[1]);
+        changeTextById("secondPlayer", boardFEN.players[0]);
+    }
 
     return Chessboard('board', config);
 }
