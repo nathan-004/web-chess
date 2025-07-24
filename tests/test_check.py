@@ -1,4 +1,4 @@
-from app.engine.game import *
+from app.engine.board import *
 
 def test_is_check_detection():
     # Plateau vide

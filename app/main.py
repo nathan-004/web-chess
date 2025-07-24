@@ -6,7 +6,7 @@ import uuid
 import logging
 
 import app.utils.logger_config # Initialise le logger
-from app.engine.game import ChessBoard, board_to_fen
+from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string, Move
 from app.engine.utils import WHITE, BLACK
 

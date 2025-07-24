@@ -1,6 +1,6 @@
 from app.engine.pieces import King, Rook, Bishop
 from app.engine.utils import Position, Move, SpecialMove
-from app.engine.game import blank_board, ChessBoard, ConsoleChessboard
+from app.engine.board import blank_board, ChessBoard, ConsoleChessboard
 from app.engine.utils import WHITE, BLACK
 
 def find_castling_move(moves, expected_king_pos):
