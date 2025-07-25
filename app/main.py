@@ -44,7 +44,6 @@ def init_session():
     session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
     return jsonify({"message": "Session initialisée", "player": session["player"]})
 
-
 @app.route("/create_board_id", methods=["POST"])
 def create_chessboard():
     id = str(uuid.uuid4())[:ID_GAME_SIZE]
