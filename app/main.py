@@ -34,21 +34,27 @@ players = set()
 @app.route("/init_session", methods=["POST"])
 def init_session():
     username = request.form["username"]
+    print(f"Username: {username}")
     player = generate_username_uuid()
     if "player" in session:
         player = session["player"]
     if username:
         if not username in players:
             player = username
+            session["games"] = {}
     session["player"] = player
     session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
-    return jsonify({"message": "Session initialisée", "player": session["player"]})
+    return redirect(url_for("home"))
 
 @app.route("/create_board_id", methods=["POST"])
 def create_chessboard():
-    id = str(uuid.uuid4())[:ID_GAME_SIZE]
-    chessboards[id] = create_chessboard_instance()
-    return jsonify({"id": id})
+    if "player" not in session:
+        return redirect(url_for("home"))
+    board_id = request.form.get("board-id", None)
+    if not board_id:
+        board_id = str(uuid.uuid4())[:ID_GAME_SIZE]
+    chessboards[board_id] = create_chessboard_instance()
+    return redirect(url_for("game_page", game_id=board_id))
 
 # ---------------------------------------------------------------------------
 # Menu
