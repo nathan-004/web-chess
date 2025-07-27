@@ -19,4 +19,15 @@
       <button id="create-board-button" type="submit">Créer un plateau</button>
     </form>
   </main>
+  <div id="notification-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="notification {{ category }}-notification">
+            <p>{{ message }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
 </body>

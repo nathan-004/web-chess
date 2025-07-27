@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify, session
-from flask import redirect, url_for
+from flask import redirect, url_for, flash
 
 from collections import defaultdict
 import uuid
@@ -9,6 +9,7 @@ import app.utils.logger_config # Initialise le logger
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import string_to_position, position_to_string, Move
 from app.engine.utils import WHITE, BLACK
+from app.utils.constants import *
 
 ID_GAME_SIZE = 8
 
@@ -43,11 +44,13 @@ def init_session():
             session["games"] = {}
     session["player"] = player
     session["games"] = session.get("games", {}) # Prévient que les parties crées lors de la création de la page soit effacées
+    flash(f"Bienvenue {player} !", "success")
     return redirect(url_for("home"))
 
 @app.route("/create_board_id", methods=["POST"])
 def create_chessboard():
     if "player" not in session:
+        flash(NON_CONNECTE, "error")
         return redirect(url_for("home"))
     board_id = request.form.get("board-id", None)
     if not board_id:
@@ -69,13 +72,15 @@ def home():
 @app.route('/game/<game_id>')
 def game_page(game_id):
     if not "player" in session:
+        flash(NON_CONNECTE, "error")
         return redirect(url_for("home"))
     games = session.get("games", {})
     player = session.get("player")
     logger.warning(games)
 
     if len(chessboards[game_id].players) >= 2 and game_id not in games:
-        return "<p>Trop de joueurs</p>"
+        flash(TROP_JOUEURS, "error")
+        return redirect(url_for("home"))
     orientation = WHITE if len(chessboards[game_id].players) == 0 else BLACK
     if game_id not in games:
         games[game_id] = orientation
