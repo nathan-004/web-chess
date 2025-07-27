@@ -5,6 +5,7 @@
 
 const moveSound = new Audio("/static/audios/move-self.mp3");
 const captureSound = new Audio("/static/audios/capture.mp3");
+const checkSound = new Audio("/static/audios/move-check.mp3");
 
 // ---------------------------------------------------------------------------
 // Style Functions
@@ -221,7 +222,11 @@ function main() {
             board.position(boardFEN.board);
         }
         if (boardFEN.board_state != currentStatus) {
+            if (boardFEN.board_state == "échecs") {
+                playSound(checkSound);
+            }
             changeTextById("status", boardFEN.board_state);
+            currentStatus = boardFEN.board_state;
         }
 
     }, 500);
