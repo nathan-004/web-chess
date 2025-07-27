@@ -1,5 +1,12 @@
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const moveSound = new Audio("/static/audios/move-self.mp3");
+const captureSound = new Audio("/static/audios/capture.mp3");
+
+// ---------------------------------------------------------------------------
 // Style Functions
 // ---------------------------------------------------------------------------
 
@@ -30,6 +37,11 @@ function changeTextById(elementID, text) {
     const element = document.getElementById(elementID);
     element.innerHTML = text;
     console.log(text);
+}
+
+function playSound(audio) {
+    audio.currentTime = 0;
+    audio.play();
 }
 
 // ---------------------------------------------------------------------------
@@ -149,6 +161,14 @@ async function onDrop(source, target, piece, newPos, oldPos, orientation) {
     if (!valid) {
         board.position(oldPos);
     }
+    else {
+        if (target in oldPos) {
+            playSound(captureSound);
+        }
+        else {
+            playSound(moveSound);
+        }
+    }
     const turn = await getCurrentTurn();
     changeTextById("turn", turn);
 }
@@ -204,7 +224,7 @@ function main() {
             changeTextById("status", boardFEN.board_state);
         }
 
-    }, 10000);
+    }, 500);
 }
 
 let currentStatus = "NaN";
