@@ -215,5 +215,8 @@ initBoard().then(instance => {
     if (board.orientation() != playerOrientation) {
         board.flip();
     }
+    $(window).on('resize', function () {
+        board.resize();
+    });
     main();
 });
