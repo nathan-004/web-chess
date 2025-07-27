@@ -36,15 +36,15 @@ function changeTextById(elementID, text) {
 // Chess Util Functions -> Server
 // ---------------------------------------------------------------------------
 
-async function startSession() {
-    await fetch('/init_session', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-        });
-    console.log("Session initialisée");
-}
+// async function startSession() {
+//    await fetch('/init_session', {
+//            method: 'POST',
+//            headers: {
+//              'Content-Type': 'application/json'
+//            },
+//        });
+//    console.log("Session initialisée");
+// }
 
 async function getMoves(source) {
     try {
@@ -166,7 +166,7 @@ async function onChange (oldPos, newPos) {
 // ---------------------------------------------------------------------------
 
 async function initBoard() {
-    await startSession();
+    // await startSession();
     const boardFEN = await getBoard();
     const turn = await getCurrentTurn();
     
@@ -204,7 +204,7 @@ function main() {
             changeTextById("status", boardFEN.board_state);
         }
 
-    }, 500);
+    }, 10000);
 }
 
 let currentStatus = "NaN";

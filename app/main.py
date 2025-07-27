@@ -34,7 +34,6 @@ players = set()
 @app.route("/init_session", methods=["POST"])
 def init_session():
     username = request.form["username"]
-    print(f"Username: {username}")
     player = generate_username_uuid()
     if "player" in session:
         player = session["player"]
@@ -53,7 +52,6 @@ def create_chessboard():
     board_id = request.form.get("board-id", None)
     if not board_id:
         board_id = str(uuid.uuid4())[:ID_GAME_SIZE]
-    chessboards[board_id] = create_chessboard_instance()
     return redirect(url_for("game_page", game_id=board_id))
 
 # ---------------------------------------------------------------------------
@@ -72,15 +70,13 @@ def home():
 def game_page(game_id):
     if not "player" in session:
         return redirect(url_for("home"))
-    
     games = session.get("games", {})
     player = session.get("player")
     logger.warning(games)
 
     if len(chessboards[game_id].players) >= 2 and game_id not in games:
         return "<p>Trop de joueurs</p>"
-    orientation = WHITE if len(chessboards[game_id].players) else BLACK
-
+    orientation = WHITE if len(chessboards[game_id].players) == 0 else BLACK
     if game_id not in games:
         games[game_id] = orientation
         session["games"] = games
