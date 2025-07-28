@@ -6,7 +6,8 @@ import uuid
 import logging
 
 import app.utils.logger_config # Initialise le logger
-from app.engine.board import ChessBoard, board_to_fen
+from app.engine.game import Game
+from app.engine.board import board_to_fen
 from app.engine.utils import string_to_position, position_to_string, Move
 from app.engine.utils import WHITE, BLACK
 from app.utils.constants import *
@@ -21,15 +22,14 @@ app.secret_key = '5QuF6Rq9GQ'
 # Création des données
 # ---------------------------------------------------------------------------
 
-def create_chessboard_instance():
-    board = ChessBoard()
-    board.players = []
-    return board
+def create_game_instance():
+    game = Game()
+    return game
 
 def generate_username_uuid():
     return f"user_{str(uuid.uuid4())[:8]}"
 
-chessboards = defaultdict(create_chessboard_instance)
+games = defaultdict(create_game_instance)
 players = set()
 
 @app.route("/init_session", methods=["POST"])
@@ -74,19 +74,21 @@ def game_page(game_id):
     if not "player" in session:
         flash(NON_CONNECTE, "error")
         return redirect(url_for("home"))
-    games = session.get("games", {})
+    current_games = session.get("games", {})
     player = session.get("player")
     logger.warning(games)
 
-    if len(chessboards[game_id].players) >= 2 and game_id not in games:
-        flash(TROP_JOUEURS, "error")
+    valid_join = games[game_id].join(player)
+    
+    if not valid_join:
+        flash(ERROR_JOIN, "error")
         return redirect(url_for("home"))
-    orientation = WHITE if len(chessboards[game_id].players) == 0 else BLACK
-    if game_id not in games:
-        games[game_id] = orientation
-        session["games"] = games
+    
+    orientation = games[game_id].get_orientation(player)
+    if game_id not in current_games:
+        current_games[game_id] = orientation
+        session["games"] = current_games
         session.modified = True
-        chessboards[game_id].players.append(player)
     else:
         orientation = session["games"][game_id]
 
@@ -107,24 +109,11 @@ def get_moves():
     data = request.get_json()
     source = data.get('source')
     id = data.get('id')
-    orientation = session["games"][id]
+    username = session.get("player")
 
-    if not source:
-        return jsonify({"error": "Source non fournie"}), 400
+    moves_str = games[id].get_moves(source, username)
 
-    start_pos = string_to_position(source)
-    if not start_pos:
-        return jsonify({"error": "Coordonnée invalide"}), 400
-
-    piece = chessboards[id].board[start_pos.y][start_pos.x]
-    if piece is None:
-        return jsonify({"moves": []})
-    if piece.color != orientation:
-        return jsonify({"error": "Pièce de la mauvaise couleur"})
-
-    moves = chessboards[id].get_moves(start_pos)
-    moves_str = [position_to_string(move.pos) for move in moves]
-    logger.debug(f"Coups trouvés pour la pièce ({start_pos}) : {moves_str}")
+    logger.debug(f"Coups trouvés pour la pièce ({source}) : {moves_str}")
     return jsonify({"moves": moves_str})
 
 @app.route('/move', methods=['POST'])
@@ -139,20 +128,12 @@ def move_piece():
     source = data.get("source")
     dest = data.get("destination")
     id = data.get("id")
-    orientation = session["games"][id]
+    username = session.get("player")
 
-    if not source or not dest:
-        return jsonify({"error": "Position non fournies"}), 400
+    valid = games[id].move(username, source, dest)
     
-    start_pos, end_pos = string_to_position(source), string_to_position(dest)
-    if not start_pos or not end_pos:
-        return jsonify({"error": "Coordonnée invalide"}), 400
-    
-    if chessboards[id].board[start_pos.y][start_pos.x].color != orientation:
-        return jsonify({"error": "Pas la bonne pièce à jouer"}), 400
-    valid = chessboards[id].move(Move(chessboards[id].board[start_pos.y][start_pos.x], start_pos, end_pos))
-    logger.debug(f"Validation du coups : {not valid == 1}")
-    return jsonify({"valid": not valid == 1})
+    logger.debug(f"Validation du coups : {valid}")
+    return jsonify({"valid": valid})
 
 @app.route("/get_current_board", methods=["POST"])
 def get_board():
@@ -167,11 +148,9 @@ def get_board():
     data = request.get_json()
     id = data.get("id")
 
-    fen = board_to_fen(chessboards[id].board)
-    state = chessboards[id].get_state()
-    players = chessboards[id].players
+    current_state = games[id].get_current_state()
     
-    return jsonify({"board": fen, "board_state": state, "players": players})
+    return jsonify(current_state)
 
 @app.route("/get_turn", methods=["POST"])
 def get_turn():
@@ -179,7 +158,7 @@ def get_turn():
     data = request.get_json()
     id = data.get("id")
 
-    return jsonify({"turn": WHITE if len(chessboards[id].moves) % 2 == 0 else BLACK})
+    return jsonify({"turn": games[id].turn})
 
 def main():
     app.run(host="0.0.0.0", debug=True)

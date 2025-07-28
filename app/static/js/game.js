@@ -158,6 +158,7 @@ function onDragStart(source, piece, position, orientation) {
 
 async function onDrop(source, target, piece, newPos, oldPos, orientation) {
     valid = await movePiece(source, target);
+    console.log(valid);
 
     if (!valid) {
         board.position(oldPos);

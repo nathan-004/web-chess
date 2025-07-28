@@ -7,6 +7,6 @@ PAT = "pat"
 NONE = "None"
 
 # Affichage messages
-TROP_JOUEURS = "Trop de joueurs"
+ERROR_JOIN = "Partie non disponible"
 USERNAME_UTILISE = "Nom d'utilisateur déjà utilisé"
 NON_CONNECTE = "Nom d'utilisateur non-spécifié."

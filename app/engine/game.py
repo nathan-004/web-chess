@@ -2,19 +2,28 @@
 # Logique de jeu                               |
 # ----------------------------------------------
 
+from typing import Optional
+
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
 
+class Player:
+    def __init__(self, username:str):
+        self.username = username
+        self.games = {} # Sous forme {"id partie": "orientation"}
+
+    def __eq__(self, value:str):
+        return value == self.username
+
 class Game:
     """Logiques de jeu -> Gestion des coups, tours, échec et mats"""
-    turn = WHITE
-    players = {WHITE: None, BLACK: None}
-
     def __init__(self):
+        self.turn = WHITE
+        self.players = {WHITE: None, BLACK: None}
         self.chessboard = ChessBoard()
 
-    def join(self, player_username:str, color:str = None) -> int:
+    def join(self, player_username:str, color:str = None) -> bool:
         """
         Permet à un joueur de rejoindre la partie en sélectionnant la couleur
         
@@ -36,6 +45,8 @@ class Game:
             if self.players[color] is None:
                 self.players[color] = player_username
                 return True
+            
+        return False
         
     def leave(self, player_username:str) -> bool:
         """
@@ -51,7 +62,7 @@ class Game:
                 return True
         return False
     
-    def move(self, player_username:str, move:str) -> bool:
+    def move(self, player_username:str, source:str, target:str) -> bool:
         """
         Permet à un joueur de jouer un coup
         
@@ -61,8 +72,8 @@ class Game:
         """
         if self.players[self.turn] != player_username:
             return False
-        
-        if self.chessboard.move(string_to_position(move), self.turn) == 1:
+        move = Move(None, string_to_position(source), string_to_position(target))
+        if self.chessboard.move(move) == 1:
             return False
         self.turn = WHITE if self.turn == BLACK else BLACK
         return True
@@ -78,15 +89,29 @@ class Game:
         if self.players[self.turn] != player_username:
             return []
         
-        moves = self.chessboard.get_moves(string_to_position(source))
+        try:
+            moves = self.chessboard.get_moves(string_to_position(source))
+        except Exception as e:
+            return []
+
         return [position_to_string(move.pos) for move in moves]
     
-    def get_board(self) -> list[list[str]]:
+    def get_current_state(self) -> dict:
         """
-        Retourne l'échiquier sous forme de liste de listes
+        Retourne l'état de l'échiquier sous forme de dictionnaire contenant l'échiquier, les joueurs, l'état du jeu
         
         Returns
         -------
-        list[list[str]] : Échiquier
+        dict : {"board": notation fen, "board_state": échecs, pat, ..., "players": liste des joueurs}
         """
-        return board_to_fen(self.chessboard.board)
+        return {
+                "board": board_to_fen(self.chessboard.board), 
+                "board_state": self.chessboard.get_state(),
+                "players": [self.players[WHITE], self.players[BLACK]]
+            }
+    
+    def get_orientation(self, username:str) -> Optional[str]:
+        """Retourne la couleur de l'utilisateur s'il est dans la partie sinon None"""
+        for col in self.players:
+            if self.players[col] == username:
+                return col
