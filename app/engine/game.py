@@ -3,6 +3,7 @@
 # ----------------------------------------------
 
 from typing import Optional
+import time
 
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
@@ -21,6 +22,12 @@ class Game:
     def __init__(self):
         self.turn = WHITE
         self.players = {WHITE: None, BLACK: None}
+
+        # Temps en secondes
+        self.black_time = 600
+        self.white_time = 600
+        self.start_timer()
+
         self.chessboard = ChessBoard()
 
     def join(self, player_username:str, color:str = None) -> bool:
@@ -75,7 +82,9 @@ class Game:
         move = Move(None, string_to_position(source), string_to_position(target))
         if self.chessboard.move(move) == 1:
             return False
+        self.end_timer()
         self.turn = WHITE if self.turn == BLACK else BLACK
+        self.start_timer()
         return True
     
     def get_moves(self, source:str, player_username:str) -> list[str]:
@@ -105,9 +114,11 @@ class Game:
         dict : {"board": notation fen, "board_state": échecs, pat, ..., "players": liste des joueurs}
         """
         return {
-                "board": board_to_fen(self.chessboard.board), 
-                "board_state": self.chessboard.get_state(),
-                "players": [self.players[WHITE], self.players[BLACK]]
+            "board": board_to_fen(self.chessboard.board), 
+            "board_state": self.chessboard.get_state(),
+            "players": [self.players[WHITE], self.players[BLACK]],
+            "black_time": self.get_current_time(BLACK),
+            "white_time": self.get_current_time(WHITE)
             }
     
     def get_orientation(self, username:str) -> Optional[str]:
@@ -115,3 +126,23 @@ class Game:
         for col in self.players:
             if self.players[col] == username:
                 return col
+            
+    def start_timer(self):
+        """Stocke le temps présent"""
+        self.start_time = time.time()
+
+    def get_current_time(self, color):
+        """Retourne la différence du temps stocké avec le temps présent"""  
+        if color == self.turn:
+            player_time = getattr(self, f"{color}_time") - (time.time() - self.start_time)
+        else:
+            player_time = getattr(self, f"{color}_time")
+        
+        return player_time
+    
+    def end_timer(self):
+        """Termine le timer et stocke le temps des joueurs"""
+        if self.turn == WHITE:
+            self.white_time = self.get_current_time(WHITE)
+        else:
+            self.black_time = self.get_current_time(BLACK)

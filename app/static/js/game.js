@@ -230,6 +230,15 @@ function main() {
             currentStatus = boardFEN.board_state;
         }
 
+        if (playerOrientation == "white") {
+            changeTextById("currentPlayerTime", boardFEN.white_time);
+            changeTextById("secondPlayerTime", boardFEN.black_time);
+        }
+        else {
+            changeTextById("currentPlayerTime", boardFEN.black_time);
+            changeTextById("secondPlayerTime", boardFEN.white_time);
+        }
+
     }, 500);
 }
 

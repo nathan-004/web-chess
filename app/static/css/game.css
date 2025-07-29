@@ -26,6 +26,11 @@ main {
   margin-top: 0;
 }
 
+.profile-information {
+  display: flex;
+  gap: 10px;
+}
+
 #board {
   width: 800px;
   height: 800px;
