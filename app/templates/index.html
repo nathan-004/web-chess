@@ -7,15 +7,15 @@
 </head>
 <body>
   <main>
-    <h1>Nouvelle Partie</h1>
     <form id="start-form" method="post" action="/init_session">
       <label for="username">Nom d'utilisateur :</label>
-      <input type="text" id="username" name="username">
+      <input type="text" id="username" name="username" placeholder="Entrez votre nom">
       <button type="submit">Sauvegarder</button>
     </form>
+
     <form id="create-board-form" method="post" action="/create_board_id">
       <label for="board-id">ID du plateau :</label>
-      <input type="text" id="board-id" name="board-id">
+      <input type="text" id="board-id" name="board-id" placeholder="Ex : partie123">
       <button id="create-board-button" type="submit">Créer un plateau</button>
     </form>
   </main>
