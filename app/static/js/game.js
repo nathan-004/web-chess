@@ -8,6 +8,16 @@ const captureSound = new Audio("/static/audios/capture.mp3");
 const checkSound = new Audio("/static/audios/move-check.mp3");
 
 // ---------------------------------------------------------------------------
+// Utils Functions
+// ---------------------------------------------------------------------------
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+// ---------------------------------------------------------------------------
 // Style Functions
 // ---------------------------------------------------------------------------
 
@@ -230,13 +240,15 @@ function main() {
             currentStatus = boardFEN.board_state;
         }
 
+        const whiteTime = formatTime(boardFEN.white_time);
+        const blackTime = formatTime(boardFEN.black_time);
         if (playerOrientation == "white") {
-            changeTextById("currentPlayerTime", boardFEN.white_time);
-            changeTextById("secondPlayerTime", boardFEN.black_time);
+            changeTextById("currentPlayerTime", whiteTime);
+            changeTextById("secondPlayerTime", blackTime);
         }
         else {
-            changeTextById("currentPlayerTime", boardFEN.black_time);
-            changeTextById("secondPlayerTime", boardFEN.white_time);
+            changeTextById("currentPlayerTime", blackTime);
+            changeTextById("secondPlayerTime", whiteTime);
         }
 
     }, 500);
