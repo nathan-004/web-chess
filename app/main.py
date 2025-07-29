@@ -13,6 +13,7 @@ from app.engine.utils import WHITE, BLACK
 from app.utils.constants import *
 
 ID_GAME_SIZE = 8
+MIN_USERNAME_SIZE = 4
 
 logger = logging.getLogger(app.utils.logger_config.APP_NAME)
 app = Flask(__name__)
@@ -27,10 +28,22 @@ def create_game_instance():
     return game
 
 def generate_username_uuid():
-    return f"user_{str(uuid.uuid4())[:8]}"
+    return f"user_{str(uuid.uuid4())[:3]}"
 
 games = defaultdict(create_game_instance)
 players = set()
+
+@app.route("/is_valid_username", methods=["POST"])
+def is_valid_username():
+    data = request.get_json()
+    username = data.get("username")
+
+    if len(username) < MIN_USERNAME_SIZE:
+        return jsonify({"valid": False, "message": f"Le nom d'utilisateur doit comporter au moins {MIN_USERNAME_SIZE} caractères."})
+    if username in players:
+        return jsonify({"valid": False, "message": "Nom d'utilisateur déjà utilisé."})
+    
+    return jsonify({"valid": True})
 
 @app.route("/init_session", methods=["POST"])
 def init_session():

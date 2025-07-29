@@ -10,6 +10,7 @@
     <form id="start-form" method="post" action="/init_session">
       <label for="username">Nom d'utilisateur :</label>
       <input type="text" id="username" name="username" placeholder="Entrez votre nom">
+      <p id="usernameErrorMessage"></p>
       <button type="submit">Sauvegarder</button>
     </form>
 
@@ -30,4 +31,5 @@
       {% endif %}
     {% endwith %}
   </div>
+  <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 </body>

@@ -53,6 +53,16 @@ button:hover {
   background-color: #0056b3;
 }
 
+#usernameErrorMessage:empty {
+  display: none;
+}
+
+#usernameErrorMessage {
+  margin: 4px 0;
+  font-size: 0.9em;
+  color: red;
+}
+
 #notification-container {
   position: fixed;
   top: 20px;
