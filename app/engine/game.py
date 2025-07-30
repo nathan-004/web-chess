@@ -5,6 +5,7 @@
 from typing import Optional
 import time
 
+from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
@@ -19,6 +20,8 @@ class Player:
 
 class Game:
     """Logiques de jeu -> Gestion des coups, tours, échec et mats"""
+    END_STATES = set([CHECKMATE, PAT, STALEMATE])
+
     def __init__(self):
         self.turn = WHITE
         self.players = {WHITE: None, BLACK: None}
@@ -113,9 +116,12 @@ class Game:
         -------
         dict : {"board": notation fen, "board_state": échecs, pat, ..., "players": liste des joueurs}
         """
+        board_state = self.chessboard.get_state()
+
         return {
             "board": board_to_fen(self.chessboard.board), 
-            "board_state": self.chessboard.get_state(),
+            "board_state": board_state,
+            "end": board_state in self.END_STATES,
             "players": [self.players[WHITE], self.players[BLACK]],
             "black_time": self.get_current_time(BLACK),
             "white_time": self.get_current_time(WHITE)

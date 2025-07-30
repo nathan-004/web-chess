@@ -296,7 +296,7 @@ class ChessBoard:
             board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
             return board
         
-    def is_stalemate(self, board:Optional[list[list[Optional[Piece]]]] = None, color = None) -> bool:
+    def is_pat(self, board:Optional[list[list[Optional[Piece]]]] = None, color = None) -> bool:
         """Renvoie True si l'échiquier renvoyé correspond à une situation de pat"""
         if board is None:
             board = self.board
@@ -314,7 +314,7 @@ class ChessBoard:
             if self.is_checkmate():
                 return CHECKMATE
             return CHECK
-        elif self.is_stalemate():
+        elif self.is_pat():
             return PAT
 
         return NONE

@@ -226,7 +226,7 @@ async function initBoard() {
 }
 
 function main() {
-    setInterval(async function () {
+    let intervalID = setInterval(async function () {
         const boardFEN = await getBoard();
 
         if (boardFEN.board != board.fen()) {
@@ -249,6 +249,11 @@ function main() {
         else {
             changeTextById("currentPlayerTime", blackTime);
             changeTextById("secondPlayerTime", whiteTime);
+        }
+
+        // Vérif fin partie
+        if (boardFEN.end) {
+            clearInterval(intervalID);
         }
 
     }, 500);

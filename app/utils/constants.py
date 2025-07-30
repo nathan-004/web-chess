@@ -1,9 +1,10 @@
 APP_NAME = "chess-app"
 
 # Status de l'échiquier
-CHECKMATE = "échecs et mats"
-CHECK = "échecs"
+CHECKMATE = "checkmate"
+CHECK = "check"
 PAT = "pat"
+STALEMATE = "stalemate"
 NONE = "None"
 
 # Affichage messages
