@@ -4,11 +4,14 @@
 
 from typing import Optional
 import time
+from collections import namedtuple, defaultdict
 
 from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
+
+Message = namedtuple("Message", ["sender", "content"])
 
 class Player:
     def __init__(self, username:str):
@@ -32,6 +35,9 @@ class Game:
         self.start_timer()
 
         self.chessboard = ChessBoard()
+
+        self.messages = []
+        self.messages_received = defaultdict(lambda : 0) # Sous forme {`username`: index}
 
     def join(self, player_username:str, color:str = None) -> bool:
         """
@@ -152,3 +158,20 @@ class Game:
             self.white_time = self.get_current_time(WHITE)
         else:
             self.black_time = self.get_current_time(BLACK)
+
+    def add_message(self, message, username):
+        """Ajoute un NamedTuple dans self.messages"""
+        message = Message(sender=username, content=message)
+
+        self.messages.append(message)
+
+        return True
+    
+    def get_messages(self, username:str, reset:bool=False):
+        """Renvoie les messages que l'utilisateur n'a pas actuellement"""
+        messages_size = len(self.messages)
+        n_message = self.messages_received[username]
+        self.messages_received[username] = messages_size
+        if reset:
+            return [message.content for message in self.messages]
+        return [message.content for message in self.messages[n_message:messages_size]]

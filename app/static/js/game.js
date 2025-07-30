@@ -7,6 +7,10 @@ const moveSound = new Audio("/static/audios/move-self.mp3");
 const captureSound = new Audio("/static/audios/capture.mp3");
 const checkSound = new Audio("/static/audios/move-check.mp3");
 
+const messageForm = document.getElementById("messageForm");
+const messageInput = document.getElementById("messageInput");
+const messageList = document.getElementById("messagesList");
+
 // ---------------------------------------------------------------------------
 // Utils Functions
 // ---------------------------------------------------------------------------
@@ -47,12 +51,38 @@ function highlightPossibleMoves(squares) {
 function changeTextById(elementID, text) {
     const element = document.getElementById(elementID);
     element.innerHTML = text;
-    console.log(text);
 }
 
 function playSound(audio) {
     audio.currentTime = 0;
     audio.play();
+}
+
+function addMessages(messages) {
+    // messages : liste de messages
+    messages.forEach(msg => {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message");
+
+        const contentElement = document.createElement("div");
+        contentElement.classList.add("message-content");
+        contentElement.textContent = msg;
+
+        messageElement.appendChild(contentElement);
+        messageList.appendChild(messageElement);
+    });
+
+    messageList.scrollTop = messageList.scrollHeight;
+}
+
+async function updateMessages(reset=false) {
+    const messages = await getMessages(reset);
+
+    if (reset) {
+        messageList.innerHTML = "";
+    }
+
+    addMessages(messages);
 }
 
 // ---------------------------------------------------------------------------
@@ -122,7 +152,7 @@ async function getBoard() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id: id  // Assure-toi que la variable `id` existe dans le contexte
+            id: id
         })
     });
 
@@ -141,7 +171,7 @@ async function getCurrentTurn() {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            id: id  // Assure-toi que la variable `id` existe dans le contexte
+            id: id
         })
     });
 
@@ -151,6 +181,30 @@ async function getCurrentTurn() {
 
     const data = await response.json();
     return data.turn;
+}
+
+// ---------------------------------------------------------------------------
+// Messages Functions -> Server
+// ---------------------------------------------------------------------------
+
+async function getMessages(reset=false) {
+    const response = await fetch('/get_messages', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: id,
+            reset: reset
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.messages;
 }
 
 // ---------------------------------------------------------------------------
@@ -194,6 +248,25 @@ async function onChange (oldPos, newPos) {
 }
 
 // ---------------------------------------------------------------------------
+// Form Listeners
+// ---------------------------------------------------------------------------
+
+messageForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const message = messageInput.value;
+    if (!message) return;
+
+    const response = await fetch("/send_message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message, id }),
+    });
+
+    messageInput.value = "";
+})
+
+// ---------------------------------------------------------------------------
 // Config chessboard
 // ---------------------------------------------------------------------------
 
@@ -221,6 +294,8 @@ async function initBoard() {
         changeTextById("currentPlayer", boardFEN.players[1]);
         changeTextById("secondPlayer", boardFEN.players[0]);
     }
+
+    updateMessages(true);
 
     return Chessboard('board', config);
 }
@@ -250,6 +325,8 @@ function main() {
             changeTextById("currentPlayerTime", blackTime);
             changeTextById("secondPlayerTime", whiteTime);
         }
+
+        updateMessages();
 
         // Vérif fin partie
         if (boardFEN.end) {

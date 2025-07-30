@@ -22,10 +22,22 @@
       </div>
     </div>
     <div class="infos-container">
-      <h2>Informations</h2>
-      <p>Joueur: {{ orientation }}</p>
-      <p>Statut: <span id="status">NaN</span></p>
-      <p>Turn: <span id="turn">NaN</span></p>
+      <div class="game-info-container">
+        <h2>Informations</h2>
+        <p>Joueur: {{ orientation }}</p>
+        <p>Statut: <span id="status">NaN</span></p>
+        <p>Turn: <span id="turn">NaN</span></p>
+      </div>
+
+      <div class="messages-container">
+        <div class="messages-list" id="messagesList">
+          <!-- Exemple : <div class="message">Message 1</div> -->
+        </div>
+        <form method="post" action="/send_message" id="messageForm">
+          <input type="text" id="messageInput" name="message" placeholder="Votre message..." autocomplete="off" required>
+          <button type="submit">Envoyer</button>
+        </form>
+      </div>
     </div>
   </main>
 

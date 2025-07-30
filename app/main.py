@@ -79,6 +79,32 @@ def home():
     return render_template('index.html')
 
 # ---------------------------------------------------------------------------
+# Messages
+# ---------------------------------------------------------------------------
+
+@app.route('/send_message', methods=['POST'])
+def add_message():
+    data = request.get_json()
+    id = data.get("id")
+    message = data.get("message")
+    username = session.get("player")
+
+    result = games[id].add_message(message, username)
+
+    return jsonify({"valid": result})
+
+@app.route("/get_messages", methods=['POST'])
+def get_messages():
+    data = request.get_json()
+    id = data.get("id")
+    reset = data.get("reset")
+    username = session.get("player")
+
+    messages = games[id].get_messages(username, reset)
+
+    return jsonify({"messages": messages})
+
+# ---------------------------------------------------------------------------
 # Création du jeu                                                    |
 # ---------------------------------------------------------------------------
 

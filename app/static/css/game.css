@@ -14,18 +14,6 @@ main {
   flex-direction: column;
 }
 
-.infos-container {
-  flex: 1;
-  background-color: #ffffff;
-  padding: 20px;
-  border-left: 2px solid #ddd;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.05);
-}
-
-.infos-container h2 {
-  margin-top: 0;
-}
-
 .profile-information {
   display: flex;
   gap: 10px;
@@ -34,6 +22,80 @@ main {
 #board {
   width: 800px;
   height: 800px;
+}
+
+.infos-container {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px;
+  border-left: 2px solid #ddd;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.05);
+}
+
+/* Informations de jeu */
+.game-info-container {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.game-info-container h2 {
+  margin-top: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+/* Conteneur de messages */
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  height: 300px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Liste des messages */
+.messages-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 5px;
+  margin-bottom: 10px;
+}
+
+.messages-list::-webkit-scrollbar {
+  width: 5px;
+}
+.messages-list::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 5px;
+}
+
+/* Formulaire d'envoi */
+.messages-container form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.messages-container input[type="text"] {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.messages-container button {
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 /*-------------------------Responsive------------------------*/
