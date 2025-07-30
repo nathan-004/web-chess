@@ -60,7 +60,7 @@ def test_stalemate_simple_position():
     board.board[6][5] = King(BLACK, Position(5, 6))
     board.board[5][6] = Queen(BLACK, Position(6, 5))
 
-    assert board.is_stalemate(color=WHITE) is True
+    assert board.is_pat(color=WHITE) is True
 
 def test_not_stalemate_black_has_move():
     board = ChessBoard(blank_board())
@@ -70,4 +70,4 @@ def test_not_stalemate_black_has_move():
     board.board[5][6] = Queen(WHITE, Position(6, 5)) 
 
     ConsoleChessboard(board.board).display()
-    assert board.is_stalemate(color=WHITE) is False
+    assert board.is_pat(color=WHITE) is False
