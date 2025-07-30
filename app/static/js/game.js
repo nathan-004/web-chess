@@ -233,7 +233,7 @@ function main() {
             board.position(boardFEN.board);
         }
         if (boardFEN.board_state != currentStatus) {
-            if (boardFEN.board_state == "échecs") {
+            if (boardFEN.board_state == "check") {
                 playSound(checkSound);
             }
             changeTextById("status", boardFEN.board_state);
