@@ -5,6 +5,7 @@ class King(Piece):
         super().__init__(color)
         self.symbol = '\u2654' if color != WHITE else '\u265A'
         self.letter = "k"
+        self.value = 0
         self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list[Move]:
@@ -97,6 +98,7 @@ class Queen(Piece):
         super().__init__(color)
         self.symbol = '\u2655' if color != WHITE else '\u265B'
         self.letter = "q"
+        self.value = 8
         self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
@@ -122,6 +124,7 @@ class Rook(Piece):
         super().__init__(color)
         self.symbol = '\u2656' if color != WHITE else '\u265C'
         self.letter = "r"
+        self.value = 5
         self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
@@ -147,6 +150,7 @@ class Bishop(Piece):
         super().__init__(color)
         self.symbol = '\u2657' if color != WHITE else '\u265D'
         self.letter = "b"
+        self.value = 3
         self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board: list) -> list[Move]:
@@ -171,6 +175,7 @@ class Knight(Piece):
         super().__init__(color)
         self.symbol = '\u2658' if color != WHITE else '\u265E'
         self.letter = "n"
+        self.value = 3
         self.initial_position = initial_position
 
     def get_moves(self, pos: Position, board) -> list[Move]:
@@ -199,6 +204,7 @@ class Pawn(Piece):
         super().__init__(color)
         self.symbol = '\u2659' if color != WHITE else '\u265F'
         self.letter = "p"
+        self.value = 1
         self.direction = -1 if color == WHITE else 1
         self.initial_position = initial_position
 

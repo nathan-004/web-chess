@@ -36,6 +36,7 @@ class Piece:
     def __init__(self, color, initial_position: Optional[Position] = None):
         self.color = color
         self.symbol = " "
+        self.value = 1
         self.moves = []
         self.initial_position = initial_position
         self.has_moved = False
