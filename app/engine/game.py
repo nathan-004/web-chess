@@ -35,8 +35,8 @@ class Game:
         self.players = {WHITE: None, BLACK: None}
 
         # Temps en secondes
-        self.black_time = 10
-        self.white_time = 10
+        self.black_time = 600
+        self.white_time = 600
         self.start_timer()
 
         self.chessboard = ChessBoard()

@@ -318,6 +318,21 @@ class ChessBoard:
             return PAT
 
         return NONE
+    
+    def get_material_value(self, color:Optional[str] = None, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
+        """Retourne la valeur des pièces de la couleur spécifiée ou des deux couleurs"""
+        if board is None:
+            board = self.board # Passage par référence
+        total = 0
+
+        for row in board:
+            for piece in row:
+                if piece is None:
+                    continue
+                if piece.color == color or color is None:
+                    total += piece.value
+        
+        return total
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):
