@@ -336,7 +336,7 @@ function main() {
 
         // Vérif fin partie
         if (boardFEN.end) {
-            clearInterval(intervalID);
+            //clearInterval(intervalID);
         }
 
     }, 500);

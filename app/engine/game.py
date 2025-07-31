@@ -35,14 +35,16 @@ class Game:
         self.players = {WHITE: None, BLACK: None}
 
         # Temps en secondes
-        self.black_time = 600
-        self.white_time = 600
+        self.black_time = 10
+        self.white_time = 10
         self.start_timer()
 
         self.chessboard = ChessBoard()
 
         self.messages = []
         self.messages_received = defaultdict(lambda : 0) # Sous forme {`username`: index}
+
+        self.end = False
 
     def join(self, player_username:str, color:str = None) -> bool:
         """
@@ -91,6 +93,9 @@ class Game:
         -------
         bool : True si le coup a été joué, False sinon.
         """
+        if self.end:
+            return False
+
         if self.players[self.turn] != player_username:
             return False
         move = Move(None, string_to_position(source), string_to_position(target))
@@ -109,6 +114,9 @@ class Game:
         -------
         list[str] : Liste des coups possibles sous forme de chaîne de caractères
         """
+        if self.end:
+            return []
+
         if self.players[self.turn] != player_username:
             return []
         
@@ -128,11 +136,13 @@ class Game:
         dict : {"board": notation fen, "board_state": échecs, pat, ..., "players": liste des joueurs}
         """
         board_state = self.chessboard.get_state()
+        if board_state in self.END_STATES or self.no_time_left():
+            self.end = True
 
         return {
             "board": board_to_fen(self.chessboard.board), 
             "board_state": board_state,
-            "end": board_state in self.END_STATES,
+            "end": self.end,
             "players": [self.players[WHITE], self.players[BLACK]],
             "black_time": self.get_current_time(BLACK),
             "white_time": self.get_current_time(WHITE)
@@ -155,14 +165,15 @@ class Game:
         else:
             player_time = getattr(self, f"{color}_time")
         
-        return player_time
+        return max(player_time, 0)
     
     def end_timer(self):
         """Termine le timer et stocke le temps des joueurs"""
+        time = self.get_current_time(self.turn)
         if self.turn == WHITE:
-            self.white_time = self.get_current_time(WHITE)
+            self.white_time = time
         else:
-            self.black_time = self.get_current_time(BLACK)
+            self.black_time = time
 
     def add_message(self, message, username):
         """Ajoute un NamedTuple dans self.messages"""
@@ -180,3 +191,16 @@ class Game:
         if reset:
             return [message.to_dict() for message in self.messages]
         return [message.to_dict() for message in self.messages[n_message:messages_size]]
+    
+    def no_time_left(self):
+        """ Retourne True si un des deux joueurs n'a plus de temps """
+        if self.get_current_time(WHITE) <= 0:
+            self.end_timer()
+            self.end = True
+        elif self.get_current_time(BLACK) <= 0:
+            self.end_timer
+            self.end = True   
+        else:
+            return False
+
+        return True
