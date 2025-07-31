@@ -64,10 +64,15 @@ function addMessages(messages) {
         const messageElement = document.createElement("div");
         messageElement.classList.add("message");
 
+        const senderElement = document.createElement("div");
+        senderElement.classList.add("message-sender");
+        senderElement.textContent = msg.sender;
+
         const contentElement = document.createElement("div");
         contentElement.classList.add("message-content");
-        contentElement.textContent = msg;
+        contentElement.textContent = msg.content;
 
+        messageElement.appendChild(senderElement);
         messageElement.appendChild(contentElement);
         messageList.appendChild(messageElement);
     });
@@ -188,6 +193,7 @@ async function getCurrentTurn() {
 // ---------------------------------------------------------------------------
 
 async function getMessages(reset=false) {
+    console.log(reset);
     const response = await fetch('/get_messages', {
         method: 'POST',
         headers: {

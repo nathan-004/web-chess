@@ -74,6 +74,19 @@ main {
   border-radius: 5px;
 }
 
+.message {
+  display: flex;
+  gap: 5px;
+}
+
+.message-sender {
+  font-weight: bold;
+}
+
+.message-content {
+  font-weight: lighter;
+}
+
 /* Formulaire d'envoi */
 .messages-container form {
   display: flex;

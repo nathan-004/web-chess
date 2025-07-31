@@ -2,16 +2,21 @@
 # Logique de jeu                               |
 # ----------------------------------------------
 
-from typing import Optional
+from typing import Optional, NamedTuple
 import time
-from collections import namedtuple, defaultdict
+from collections import defaultdict
 
 from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
 
-Message = namedtuple("Message", ["sender", "content"])
+class Message(NamedTuple):
+    sender:str
+    content:str
+
+    def to_dict(self) -> dict:
+        return {"sender": self.sender, "content": self.content}
 
 class Player:
     def __init__(self, username:str):
@@ -167,11 +172,11 @@ class Game:
 
         return True
     
-    def get_messages(self, username:str, reset:bool=False):
+    def get_messages(self, username:str, reset:bool=False) -> list[dict]:
         """Renvoie les messages que l'utilisateur n'a pas actuellement"""
         messages_size = len(self.messages)
         n_message = self.messages_received[username]
         self.messages_received[username] = messages_size
         if reset:
-            return [message.content for message in self.messages]
-        return [message.content for message in self.messages[n_message:messages_size]]
+            return [message.to_dict() for message in self.messages]
+        return [message.to_dict() for message in self.messages[n_message:messages_size]]
