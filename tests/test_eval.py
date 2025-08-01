@@ -3,7 +3,7 @@ from app.engine.board import ChessBoard
 from app.engine.utils import WHITE, BLACK
 from app.engine.pieces import Rook, Queen, Pawn, King
 from app.engine.utils import Position
-from app.bot.evaluation import evaluation_materielle
+from app.bot.evaluation import *
 
 def test_material_eval_start():
     board = ChessBoard()
@@ -34,3 +34,7 @@ def test_only_kings():
     board.board[0][0] = King(WHITE, Position(0, 0))
     board.board[7][7] = King(BLACK, Position(7, 7))
     assert evaluation_materielle(board) == pytest.approx(0.0), "Rois seuls = égalité"
+
+def test_control_eval_empty_board():
+    board = ChessBoard()
+    assert threat_evaluation(board) == pytest.approx(0.0), "Plateau vide = égalité (0.5)"

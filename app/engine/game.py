@@ -10,7 +10,7 @@ from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
-from app.bot.evaluation import evaluation_materielle
+from app.bot.evaluation import evaluation_materielle, threat_evaluation
 
 class Message(NamedTuple):
     sender:str
@@ -209,6 +209,6 @@ class Game:
     
     def get_evaluation(self):
         """Retourne un nombre entre -1 et 1 correspondant à l'évaluation de la partie"""
-        result = evaluation_materielle(self.chessboard)
+        result = threat_evaluation(self.chessboard)
 
         return result

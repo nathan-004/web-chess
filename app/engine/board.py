@@ -110,7 +110,7 @@ class ChessBoard:
 
         return board
 
-    def valid_move(self, move:Move, board:Optional[list]=None):
+    def valid_move(self, move:Move, board:Optional[list]=None, turn=True):
         """Vérifie si un coup peut être joué à partir des règles de mouvements dans les classes des pièces"""
         if not (8 > move.start_pos.x >= 0):
             return False
@@ -139,11 +139,12 @@ class ChessBoard:
             if start_piece.color == end_piece.color:
                 logger.info(f"La pièce tente de se déplacer sur une pièce de la même couleur")
                 return False
-            
-        turn = WHITE if len(self.moves) % 2 == 0 else BLACK
-        if board[move.start_pos.y][move.start_pos.x].color != turn:
-            logger.info("Mauvais tours")
-            return False
+        
+        if turn:
+            turn = WHITE if len(self.moves) % 2 == 0 else BLACK
+            if board[move.start_pos.y][move.start_pos.x].color != turn:
+                logger.info("Mauvais tours")
+                return False
         
         moves = start_piece.get_moves(move.start_pos, board) + start_piece.special_moves(move.start_pos, self)
         for piece_move in moves:
@@ -263,7 +264,7 @@ class ChessBoard:
                 move = self.moves.pop()
                 self.board[move.end_pos.y][move.end_pos.x], self.board[move.start_pos.y][move.start_pos.x] = None, self.board[move.end_pos.y][move.end_pos.x]
 
-    def get_moves(self, start_pos:Position, board:Optional[list[list[Optional[Piece]]]] = None) -> list[Position]:
+    def get_moves(self, start_pos:Position, board:Optional[list[list[Optional[Piece]]]] = None, turn=True) -> list[Move]:
         """Retourne les coups possibles d'une pièce en vérifiant qu'il n'y ait pas d'échecs ou pas le bon tour"""
         if board is None:
             board = self.board
@@ -274,7 +275,7 @@ class ChessBoard:
         piece = board[start_pos.y][start_pos.x]
         moves = []
         for move in piece.get_moves(start_pos, board):
-            if isinstance(self.valid_move(move, board), Move):
+            if isinstance(self.valid_move(move, board, turn), Move):
                 moves.append(move)
         
         moves.extend(piece.special_moves(start_pos, self))
@@ -333,6 +334,29 @@ class ChessBoard:
                     total += piece.value
         
         return total
+    
+    def get_total_moves(self, color:str, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
+        """
+        Retourne un score correspondant au contrôle exercé sur l'échiquier
+        Calculé en faisant la somme de la valeur des pièces attaquées par le camps : 
+        - 1 pour les pièces vides
+        """
+        if board is None:
+            board = self.board
+        score = 0
+        
+        for piece_type in self.PIECES:
+            pieces = self.find_pieces(piece_type, color, board)
+            for piece_pos in pieces:
+                moves = self.get_moves(piece_pos, board, False)
+                for move in moves:
+                    target = board[move.pos.y][move.pos.x]
+                    if target is None:
+                        score += 1
+                    elif target.color != color:
+                        score += target.value
+        
+        return score
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):

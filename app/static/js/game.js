@@ -91,16 +91,11 @@ async function updateMessages(reset=false) {
 }
 
 function updateEvaluationBar(eval) {
-    const leftDist = Math.abs(eval - 1) / 2;  // pour les blancs
-    const rightDist = Math.abs(eval + 1) / 2; // pour les noirs
+    const whiteControl = (eval + 1) / 2;
+    const blackControl = 1 - whiteControl;
 
-    const total = leftDist + rightDist;
-
-    const leftFlex = leftDist / total;
-    const rightFlex = rightDist / total;
-
-    document.getElementById("whiteBar").style.flex = leftFlex;
-    document.getElementById("blackBar").style.flex = rightFlex;
+    document.getElementById("whiteBar").style.flex = whiteControl;
+    document.getElementById("blackBar").style.flex = blackControl;
 }
 
 // ---------------------------------------------------------------------------
@@ -206,7 +201,6 @@ async function getCurrentTurn() {
 // ---------------------------------------------------------------------------
 
 async function getMessages(reset=false) {
-    console.log(reset);
     const response = await fetch('/get_messages', {
         method: 'POST',
         headers: {
