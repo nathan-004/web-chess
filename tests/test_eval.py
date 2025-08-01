@@ -12,7 +12,7 @@ def test_material_eval_start():
 def test_empty_board():
     board = ChessBoard()
     board.board = [[None for _ in range(8)] for _ in range(8)]
-    assert evaluation_materielle(board) == 0.0, "Plateau vide = égalité (0.0)"
+    assert evaluation_materielle(board) == pytest.approx(0.0), "Plateau vide = égalité (0.0)"
 
 def test_white_advantage():
     board = ChessBoard()
@@ -33,4 +33,4 @@ def test_only_kings():
     board.board = [[None for _ in range(8)] for _ in range(8)]
     board.board[0][0] = King(WHITE, Position(0, 0))
     board.board[7][7] = King(BLACK, Position(7, 7))
-    assert evaluation_materielle(board) == 0.0, "Rois seuls = égalité"
+    assert evaluation_materielle(board) == pytest.approx(0.0), "Rois seuls = égalité"
