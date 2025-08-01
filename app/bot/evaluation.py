@@ -1,12 +1,12 @@
 from app.engine.board import ChessBoard
+from app.engine.utils import WHITE, BLACK
 
 BLACK_ADVANTAGE = -1
 WHITE_ADVANTAGE = 1
 
 def evaluation(black_eval: float, white_eval: float):
     """
-    Décorateur permettant de calculer le score entre black_eval et white_eval
-    en fonction du résultat brut d'une fonction d'évaluation.
+    Décorateur permettant de calculer le score entre black_eval et white_eval en fonction du résultat brut d'une fonction d'évaluation.
 
     Parameters
     ----------
@@ -30,3 +30,12 @@ def evaluation(black_eval: float, white_eval: float):
 
         return eval
     return decorator
+
+@evaluation(black_eval=0, white_eval=1)
+def evaluation_materielle(board:ChessBoard):
+    """Retourne le rapport des valeurs de pièces blanches et des noirs"""
+    white = board.get_material_value(WHITE)
+    black = board.get_material_value(BLACK)
+    total = white + black
+
+    return white/total if total != 0 else 0.5
