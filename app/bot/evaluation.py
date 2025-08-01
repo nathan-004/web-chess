@@ -1,10 +1,11 @@
 from app.engine.board import ChessBoard
 from app.engine.utils import WHITE, BLACK
+from app.utils.constants import CHECKMATE, CHECK, NONE, PAT, STALEMATE
 
 BLACK_ADVANTAGE = -1
 WHITE_ADVANTAGE = 1
 
-def evaluation(black_eval: float, white_eval: float):
+def evaluation(black_eval: float, white_eval: float) -> float:
     """
     Décorateur permettant de calculer le score entre black_eval et white_eval en fonction du résultat brut d'une fonction d'évaluation.
 
@@ -47,3 +48,8 @@ def threat_evaluation(board:ChessBoard):
     black = board.get_total_moves(BLACK)
     total = white + black
     return white/total if total != 0 else 0.5
+
+@evaluation(black_eval=-1, white_eval=1)
+def state_evaluation(board:ChessBoard):
+    """Retourne un score dépendant de si l'échiquier est en situation d'échecs, d'échecs et mats, ..."""
+    state = board.get_state()

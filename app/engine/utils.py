@@ -1,5 +1,7 @@
 from typing import NamedTuple, Optional
 
+from app.utils.constants import CHECKMATE, CHECK, PAT, STALEMATE, NONE
+
 class Position(NamedTuple):
     x:int
     y:int
@@ -107,3 +109,40 @@ class Roque(SpecialMove):
     @property
     def pos(self):
         return self.move
+    
+# ---------------------------------------------------------------------------
+# états de partie
+# ---------------------------------------------------------------------------
+
+class Win(str):
+    def __new__(cls, color, message):
+        obj = str.__new__(cls, message)
+        obj.color = color
+        return obj
+
+class CheckMate(Win):
+    def __new__(cls, color):
+        message = f"{CHECKMATE} {color}"
+        return super().__new__(cls, color, message)
+    
+class Stalemate(str):
+    def __new__(cls, message = STALEMATE):
+        obj = str.__new__(cls, message)
+        return obj
+    
+class Pat(Stalemate):
+    def __new__(cls, color):
+        message = f"{PAT} {color}"
+        return super().__new__(cls, color, message)
+    
+class State(str):
+    def __new__(cls, color:Optional[str], message = NONE):
+        obj = str.__new__(cls, message)
+        if color:
+            obj.color = color
+        return obj
+    
+class Normal(State):
+    def __new__(cls, color:Optional[str]):
+        message = f"{PAT} {color}" if color is not None else PAT
+        return super().__new__(cls, color, message)
