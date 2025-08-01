@@ -90,6 +90,19 @@ async function updateMessages(reset=false) {
     addMessages(messages);
 }
 
+function updateEvaluationBar(eval) {
+    const leftDist = Math.abs(eval - 1) / 2;  // pour les blancs
+    const rightDist = Math.abs(eval + 1) / 2; // pour les noirs
+
+    const total = leftDist + rightDist;
+
+    const leftFlex = leftDist / total;
+    const rightFlex = rightDist / total;
+
+    document.getElementById("whiteBar").style.flex = leftFlex;
+    document.getElementById("blackBar").style.flex = rightFlex;
+}
+
 // ---------------------------------------------------------------------------
 // Chess Util Functions -> Server
 // ---------------------------------------------------------------------------
@@ -333,6 +346,7 @@ function main() {
         }
 
         updateMessages();
+        updateEvaluationBar(boardFEN.evaluation);
 
         // Vérif fin partie
         if (boardFEN.end) {

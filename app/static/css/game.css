@@ -111,6 +111,26 @@ main {
   cursor: pointer;
 }
 
+/*------------------------- Evaluation -------------------------*/
+#evaluationContainer {
+  display: flex;
+  border: black solid 2px;
+}
+
+#evaluationContainer > div {
+  flex: 1;
+  height: 15px;
+  transition: flex 0.3s ease;
+}
+
+#whiteBar {
+  background-color: white;
+}
+
+#blackBar {
+  background-color: black;
+}
+
 /*-------------------------Responsive------------------------*/
 @media (max-width: 1350px) {
   #board {

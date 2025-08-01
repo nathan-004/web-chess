@@ -10,6 +10,7 @@ from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
+from app.bot.evaluation import evaluation_materielle
 
 class Message(NamedTuple):
     sender:str
@@ -145,7 +146,8 @@ class Game:
             "end": self.end,
             "players": [self.players[WHITE], self.players[BLACK]],
             "black_time": self.get_current_time(BLACK),
-            "white_time": self.get_current_time(WHITE)
+            "white_time": self.get_current_time(WHITE),
+            "evaluation": self.get_evaluation()
             }
     
     def get_orientation(self, username:str) -> Optional[str]:
@@ -204,3 +206,9 @@ class Game:
             return False
 
         return True
+    
+    def get_evaluation(self):
+        """Retourne un nombre entre -1 et 1 correspondant à l'évaluation de la partie"""
+        result = evaluation_materielle(self.chessboard)
+
+        return result
