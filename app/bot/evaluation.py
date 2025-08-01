@@ -31,7 +31,7 @@ def evaluation(black_eval: float, white_eval: float):
         return eval
     return decorator
 
-@evaluation(black_eval=0, white_eval=1)
+@evaluation(black_eval=0.30, white_eval=0.70)
 def evaluation_materielle(board:ChessBoard):
     """Retourne le rapport des valeurs de pièces blanches et des noirs"""
     white = board.get_material_value(WHITE)
