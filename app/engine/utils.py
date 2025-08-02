@@ -133,7 +133,7 @@ class Stalemate(str):
 class Pat(Stalemate):
     def __new__(cls, color):
         message = f"{PAT} {color}"
-        return super().__new__(cls, color, message)
+        return super().__new__(cls, message)
     
 class State(str):
     def __new__(cls, color:Optional[str], message = NONE):
@@ -143,6 +143,11 @@ class State(str):
         return obj
     
 class Normal(State):
-    def __new__(cls, color:Optional[str]):
-        message = f"{PAT} {color}" if color is not None else PAT
+    def __new__(cls, color:Optional[str] = None):
+        message = f"{NONE} {color}" if color is not None else NONE
         return super().__new__(cls, color, message)
+
+class Check(State):
+    def __new__(cls, color):
+        message = f'{CHECK} {color}'
+        return super().__new__(color, message)

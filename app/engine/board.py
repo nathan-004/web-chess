@@ -5,6 +5,7 @@ import logging
 import app.utils.logger_config
 from app.engine.pieces import *
 from app.engine.utils import Position, Piece, WHITE, BLACK, Move, SpecialMove
+from app.engine.utils import CheckMate, Pat, Normal, Check
 from app.utils.constants import CHECKMATE, CHECK, NONE, PAT
 
 logger = logging.getLogger(app.utils.logger_config.APP_NAME)
@@ -304,21 +305,24 @@ class ChessBoard:
         
         for piece_type in self.PIECES:
             for piece_pos in self.find_pieces(piece_type, color, board):
-                if len(self.get_moves(piece_pos)) > 0:
+                if len(self.get_moves(piece_pos, turn=False)) > 0:
                     return False
         
         return True
     
     def get_state(self, board:Optional[list] = None) -> str:
         """Retourne le status de la partie"""
-        if self.is_check():
-            if self.is_checkmate():
-                return CHECKMATE
-            return CHECK
-        elif self.is_pat():
-            return PAT
+        if board is None:
+            board = self.board
 
-        return NONE
+        for color in [WHITE, BLACK]:
+            if self.is_check(color):
+                if self.is_checkmate(color):
+                    return CheckMate(color)
+                return Check(color)
+            elif self.is_pat(color=color):
+                return Pat(color)
+        return Normal()
     
     def get_material_value(self, color:Optional[str] = None, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
         """Retourne la valeur des pièces de la couleur spécifiée ou des deux couleurs"""

@@ -124,6 +124,7 @@ class Game:
         try:
             moves = self.chessboard.get_moves(string_to_position(source))
         except Exception as e:
+            print(e)
             return []
 
         return [position_to_string(move.pos) for move in moves]
