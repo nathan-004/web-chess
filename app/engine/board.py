@@ -282,6 +282,20 @@ class ChessBoard:
         moves.extend(piece.special_moves(start_pos, self))
         return moves
     
+    def get_all_actions(self, board_:Optional[list] = None) -> list[Move]:
+        """Retourne tous les coups possibles"""
+        if board_ is None:
+            board = self.board
+        else:
+            board = board_
+        actions = []
+
+        for piece_type in self.PIECES:
+            for piece_pos in self.find_pieces(piece_type, self.turn if board_ is None else None, board):
+                actions.extend(self.get_moves(piece_pos, board))
+
+        return actions
+    
     def get_board(self, move:Move, board:Optional[list] = None) -> Optional[list]:
         """Retourne le coup réalisé sans vérification préalable"""
         if board is None:
@@ -340,7 +354,7 @@ class ChessBoard:
         
         return total
     
-    def get_total_moves(self, color:str, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
+    def get_total_moves_score(self, color:str, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
         """
         Retourne un score correspondant au contrôle exercé sur l'échiquier
         Calculé en faisant la somme de la valeur des pièces attaquées par le camps : 

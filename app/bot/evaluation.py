@@ -54,8 +54,8 @@ def evaluation_materielle(board:ChessBoard):
 @evaluation(black_eval=0, white_eval=1)
 def threat_evaluation(board:ChessBoard):
     """Regarde le nombre de cases controlées par les deux côtés puis retourne le nombre"""
-    white = board.get_total_moves(WHITE)
-    black = board.get_total_moves(BLACK)
+    white = board.get_total_moves_score(WHITE)
+    black = board.get_total_moves_score(BLACK)
     total = white + black
     return white/total if total != 0 else 0.5
 
