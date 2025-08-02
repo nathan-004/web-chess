@@ -1,9 +1,19 @@
+from typing import NamedTuple
+
 from app.engine.board import ChessBoard
 from app.engine.utils import WHITE, BLACK, Win, Check
 from app.utils.constants import CHECKMATE, CHECK, NONE, PAT, STALEMATE
 
 BLACK_ADVANTAGE = -1
 WHITE_ADVANTAGE = 1
+
+class Coefficients(NamedTuple):
+    """
+    Correspond aux coefficients de chaque fonction dans la moyenne des scores
+    """
+    material: float = 1.0
+    threat: float = 1.0
+    state: float = 1.0
 
 def evaluation(black_eval: float, white_eval: float) -> float:
     """
@@ -60,3 +70,15 @@ def state_evaluation(board:ChessBoard):
         return 0.5 if state.color == WHITE else -0.5
     else:
         return 0
+    
+def final_evaluation(board:ChessBoard, coeffs:Coefficients):
+    """Fais la moyenne des évaluations en utilisant les coefficients"""
+    total = 0
+    final_score = 0
+
+    for fn, coeff in zip([evaluation_materielle, threat_evaluation, state_evaluation], coeffs):
+        score = fn(board)
+        final_score += score * coeff
+        total += coeff
+
+    return final_score / total if total != 0 else 0
