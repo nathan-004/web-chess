@@ -150,4 +150,4 @@ class Normal(State):
 class Check(State):
     def __new__(cls, color):
         message = f'{CHECK} {color}'
-        return super().__new__(color, message)
+        return super().__new__(cls, color, message)

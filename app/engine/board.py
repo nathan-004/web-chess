@@ -316,12 +316,13 @@ class ChessBoard:
             board = self.board
 
         for color in [WHITE, BLACK]:
+            other_color = WHITE if color == BLACK else WHITE
             if self.is_check(color):
                 if self.is_checkmate(color):
-                    return CheckMate(color)
-                return Check(color)
+                    return CheckMate(other_color)
+                return Check(other_color)
             elif self.is_pat(color=color):
-                return Pat(color)
+                return Pat(other_color)
         return Normal()
     
     def get_material_value(self, color:Optional[str] = None, board:Optional[list[list[Optional[Piece]]]] = None) -> int:

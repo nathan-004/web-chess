@@ -1,5 +1,5 @@
 from app.engine.board import ChessBoard
-from app.engine.utils import WHITE, BLACK
+from app.engine.utils import WHITE, BLACK, Win, Check
 from app.utils.constants import CHECKMATE, CHECK, NONE, PAT, STALEMATE
 
 BLACK_ADVANTAGE = -1
@@ -53,3 +53,10 @@ def threat_evaluation(board:ChessBoard):
 def state_evaluation(board:ChessBoard):
     """Retourne un score dépendant de si l'échiquier est en situation d'échecs, d'échecs et mats, ..."""
     state = board.get_state()
+
+    if isinstance(state, Win):
+        return 1 if state.color == WHITE else -1
+    elif isinstance(state, Check):
+        return 0.5 if state.color == WHITE else -0.5
+    else:
+        return 0
