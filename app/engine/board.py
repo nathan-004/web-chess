@@ -359,8 +359,6 @@ class ChessBoard:
     def get_total_moves_score(self, color:str, board:Optional[list[list[Optional[Piece]]]] = None) -> int:
         """
         Retourne un score correspondant au contrôle exercé sur l'échiquier
-        Calculé en faisant la somme de la valeur des pièces attaquées par le camps : 
-        - 1 pour les pièces vides
         """
         if board is None:
             board = self.board
@@ -374,9 +372,27 @@ class ChessBoard:
                     target = board[move.pos.y][move.pos.x]
                     if target is None:
                         score += 1
-                    elif target.color != color:
-                        score += target.value
         
+        return score
+    
+    def threat_score(self, color:str, board:Optional[list] = None) -> int:
+        """Valeurs des pièces attaquées par la couleur adverse"""
+        if board is None:
+            board = self.board
+
+        score = 0
+        attacker_color = WHITE if color == BLACK else BLACK
+        
+        for piece_type in self.PIECES:
+            pieces = self.find_pieces(piece_type, attacker_color, board)
+            for piece_pos in pieces:
+                moves = self.get_moves(piece_pos, board, False)
+                for move in moves:
+                    target = board[move.pos.y][move.pos.x]
+                    if target is None:
+                        continue
+                    elif target.color == color:
+                        score += target.value
         return score
 
 # ------------------------ Partie dans la console ------------------------

@@ -11,7 +11,7 @@ from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
 
-from app.bot.evaluation import evaluation_materielle, threat_evaluation, state_evaluation, final_evaluation, Coefficients
+from app.bot.evaluation import evaluation_materielle, control_evaluation, threat_evaluation, final_evaluation, Coefficients
 from app.bot.minimax_ab import Node
 
 class Message(NamedTuple):
@@ -239,7 +239,7 @@ class Game:
     
     def get_evaluation(self):
         """Retourne un nombre entre -1 et 1 correspondant à l'évaluation de la partie"""
-        result = final_evaluation(self.chessboard, Coefficients())
+        result = final_evaluation(self.chessboard)
 
         return result
     

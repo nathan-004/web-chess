@@ -12,8 +12,9 @@ class Coefficients(NamedTuple):
     Correspond aux coefficients de chaque fonction dans la moyenne des scores
     """
     material: float = 1.0
-    threat: float = 1.0
+    control: float = 1.0
     state: float = 1.0
+    threat:float = 1.0
 
 def evaluation(black_eval: float, white_eval: float) -> float:
     """
@@ -51,7 +52,7 @@ def evaluation_materielle(board:ChessBoard):
     return white/total if total != 0 else 0.5
 
 @evaluation(black_eval=0, white_eval=1)
-def threat_evaluation(board:ChessBoard):
+def control_evaluation(board:ChessBoard):
     """Regarde le nombre de cases controlées par les deux côtés puis retourne le nombre"""
     white = board.get_total_moves_score(WHITE)
     black = board.get_total_moves_score(BLACK)
@@ -70,12 +71,21 @@ def state_evaluation(board:ChessBoard):
     else:
         return 0
     
+@evaluation(black_eval=1, white_eval=0)
+def threat_evaluation(board:ChessBoard):
+    """Retourne un score correspondant à la valeur des pièces attaquées"""
+    white = board.threat_score(WHITE)
+    black = board.threat_score(BLACK)
+    total = black + white
+
+    return white/total if total != 0 else 0.5
+    
 def final_evaluation(board:ChessBoard, coeffs:Coefficients):
     """Fais la moyenne des évaluations en utilisant les coefficients"""
     total = 0
     final_score = 0
 
-    for fn, coeff in zip([evaluation_materielle, threat_evaluation, state_evaluation], coeffs):
+    for fn, coeff in zip([evaluation_materielle, control_evaluation, state_evaluation, threat_evaluation], coeffs):
         score = fn(board)
         final_score += score * coeff
         total += coeff
