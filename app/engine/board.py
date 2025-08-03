@@ -80,6 +80,7 @@ class ChessBoard:
         else:
             self.board = board
         self.moves = [] # Liste de coups joués
+        self.turn = WHITE
 
     def move(self, move:Move, board:Optional[list[list]] = None) -> Optional[list[list]]:
         """
@@ -102,6 +103,7 @@ class ChessBoard:
             if is_self_board:
                 logger.debug("Ajout du coups à self.moves")
                 self.moves.append(move)
+                self.turn = BLACK if self.turn == WHITE else WHITE
         else:
             return 1
 

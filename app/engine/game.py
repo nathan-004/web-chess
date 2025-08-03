@@ -10,7 +10,9 @@ from app.utils.constants import CHECKMATE, PAT, STALEMATE
 from app.engine.board import ChessBoard, board_to_fen
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
+
 from app.bot.evaluation import evaluation_materielle, threat_evaluation, state_evaluation, final_evaluation, Coefficients
+from app.bot.minimax_ab import Node
 
 class Message(NamedTuple):
     sender:str
@@ -19,13 +21,32 @@ class Message(NamedTuple):
     def to_dict(self) -> dict:
         return {"sender": self.sender, "content": self.content}
 
-class Player:
-    def __init__(self, username:str):
-        self.username = username
-        self.games = {} # Sous forme {"id partie": "orientation"}
+class Player(str):
+    def __new__(cls, username: str):
+        obj = str.__new__(cls, username)
+        obj.username = username
+        obj.games = {}  # Sous forme {"id partie": "orientation"}
+        return obj
 
-    def __eq__(self, value:str):
-        return value == self.username
+    def __eq__(self, value):
+        return str(self) == value
+
+    def __str__(self):
+        return self.username
+
+    def __repr__(self):
+        return f"Player('{self.username}')"
+
+class Bot(Player):
+    def __new__(cls, username: str):
+        obj = super().__new__(cls, username)
+        return obj
+
+    def __eq__(self, value):
+        return super().__eq__(value)
+
+    def __repr__(self):
+        return f"Bot('{self.username}')"
 
 class Game:
     """Logiques de jeu -> Gestion des coups, tours, échec et mats"""
@@ -47,7 +68,7 @@ class Game:
 
         self.end = False
 
-    def join(self, player_username:str, color:str = None) -> bool:
+    def join(self, player_username:str, color:str = None, bot:bool = False) -> bool:
         """
         Permet à un joueur de rejoindre la partie en sélectionnant la couleur
         
@@ -55,6 +76,8 @@ class Game:
         -------
         bool : True si le joueur a rejoint la partie, False sinon.
         """
+        cs = Bot if bot else Player
+
         if any([player_username == player for player in self.players.values()]):
             return True
         if all(self.players.values()): # Vérifie qu'il reste des couleurs libres
@@ -62,12 +85,12 @@ class Game:
 
         if color is not None and color in self.players:
             if self.players[color] is None:
-                self.players[color] = player_username
+                self.players[color] = cs(player_username)
                 return True
         
         for color in self.players:
             if self.players[color] is None:
-                self.players[color] = player_username
+                self.players[color] = cs(player_username)
                 return True
             
         return False
@@ -86,7 +109,7 @@ class Game:
                 return True
         return False
     
-    def move(self, player_username:str, source:str, target:str) -> bool:
+    def move(self, player_username:str, source:Optional[str] = None, target:Optional[str] = None, move:Optional[Move] = None) -> bool:
         """
         Permet à un joueur de jouer un coup
         
@@ -94,12 +117,16 @@ class Game:
         -------
         bool : True si le coup a été joué, False sinon.
         """
+        if all([source is None, target is None]) and move is None:
+            return False
         if self.end:
             return False
 
         if self.players[self.turn] != player_username:
             return False
-        move = Move(None, string_to_position(source), string_to_position(target))
+        if move is None:
+            move = Move(None, string_to_position(source), string_to_position(target))
+
         if self.chessboard.move(move) == 1:
             return False
         self.end_timer()
@@ -138,8 +165,10 @@ class Game:
         dict : {"board": notation fen, "board_state": échecs, pat, ..., "players": liste des joueurs}
         """
         board_state = self.chessboard.get_state()
-        if board_state in self.END_STATES or self.no_time_left():
+        if any([state in self.END_STATES for state in board_state.split(" ")]) or self.no_time_left():
             self.end = True
+        elif type(self.players[self.turn]) is Bot:
+            self.play_bot()
 
         return {
             "board": board_to_fen(self.chessboard.board), 
@@ -213,3 +242,11 @@ class Game:
         result = final_evaluation(self.chessboard, Coefficients())
 
         return result
+    
+    def play_bot(self):
+        """Joue un coups si le tours correspond à un bot"""
+        root = Node(self.chessboard, self.chessboard.moves[-1], 1)
+        best_move = root.get_best_move()
+        print(best_move)
+        a = self.move(self.players[self.turn], move = best_move.move)
+        return a

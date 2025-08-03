@@ -5,7 +5,7 @@ CHECKMATE = "checkmate"
 CHECK = "check"
 PAT = "pat"
 STALEMATE = "stalemate"
-NONE = "None"
+NONE = "Normal"
 
 # Affichage messages
 ERROR_JOIN = "Partie non disponible"

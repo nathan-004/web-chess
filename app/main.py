@@ -131,6 +131,8 @@ def game_page(game_id):
     else:
         orientation = session["games"][game_id]
 
+    games[game_id].join("bot1", None, True)
+
     return render_template('game.html', game_id=game_id, orientation=orientation)
 
 # ---------------------------------------------------------------------------

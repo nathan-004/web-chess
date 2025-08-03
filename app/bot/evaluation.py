@@ -36,7 +36,6 @@ def evaluation(black_eval: float, white_eval: float) -> float:
             normalized_score = ((score - black_eval) / (white_eval - black_eval)) * (WHITE_ADVANTAGE - BLACK_ADVANTAGE) + BLACK_ADVANTAGE
 
             normalized_score = max(min(normalized_score, WHITE_ADVANTAGE), BLACK_ADVANTAGE)
-            print(normalized_score)
             return normalized_score
 
         return eval

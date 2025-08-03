@@ -6,7 +6,7 @@ from typing import NamedTuple, Optional
 from copy import deepcopy
 
 from app.engine.board import ChessBoard
-from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK
+from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK, SpecialMove
 
 from app.bot.evaluation import Coefficients, final_evaluation
 
@@ -38,14 +38,16 @@ class Node():
 
         # Stoppe ici si la partie est finie
         state = self.board.get_state()
-        if isinstance(Win, state):
+        if isinstance(state, Win):
             return BestMove(self.move, self.eval(coeffs))
-        elif isinstance(Stalemate, state):
+        elif isinstance(state, Stalemate):
             return BestMove(self.move, self.eval(coeffs))
         
         best_move = None
 
         for move in self.board.get_all_actions():
+            if isinstance(move, SpecialMove):
+                move = move.king_move
             new_board = deepcopy(self.board)
             new_board.move(move)
 
