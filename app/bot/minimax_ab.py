@@ -4,6 +4,7 @@
 
 from typing import NamedTuple, Optional
 from copy import deepcopy
+from random import randint
 
 from app.engine.board import ChessBoard
 from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK, SpecialMove
@@ -70,7 +71,7 @@ class Node():
             return best_move1
         
         if best_move1.value == best_move2.value:
-            return best_move1
+            return [best_move1, best_move2][randint(0, 1)]
 
         fn = max if self.player == WHITE else min
 

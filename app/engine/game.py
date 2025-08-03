@@ -239,7 +239,7 @@ class Game:
     
     def get_evaluation(self):
         """Retourne un nombre entre -1 et 1 correspondant à l'évaluation de la partie"""
-        result = final_evaluation(self.chessboard)
+        result = final_evaluation(self.chessboard, Coefficients())
 
         return result
     
