@@ -247,6 +247,7 @@ class Game:
         """Joue un coups si le tours correspond à un bot"""
         root = Node(self.chessboard, None, 1)
         best_move = root.get_best_move()
-        print(best_move)
+        print(root.LOG_DEPTH)
+
         a = self.move(self.players[self.turn], move = best_move.move)
         return a

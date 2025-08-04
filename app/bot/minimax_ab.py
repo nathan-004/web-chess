@@ -3,6 +3,7 @@
 #----------------------------------------------------------------------
 
 from typing import NamedTuple, Optional
+from collections import defaultdict
 from copy import deepcopy
 from random import randint
 
@@ -17,6 +18,8 @@ class BestMove(NamedTuple):
 
 class Node():
     # Contient un coups et l'échiquier
+    LOG_DEPTH = defaultdict(lambda : 0) # Dictionnaire contenant pour chaques profondeur, le nombre de noeuds 
+
     def __init__(self, board:ChessBoard, move:Move, depth:int):
         """
         Parameters
@@ -29,6 +32,7 @@ class Node():
         self.board = board
         self.move = move
         self.depth = depth
+        self.LOG_DEPTH[depth] += 1
         self.player = board.turn
 
     def get_best_move(self, coeffs:Coefficients = Coefficients(), alpha: float = -1.0, beta:float = 1.0) -> BestMove:

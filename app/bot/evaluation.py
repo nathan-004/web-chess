@@ -11,7 +11,7 @@ class Coefficients(NamedTuple):
     """
     Correspond aux coefficients de chaque fonction dans la moyenne des scores
     """
-    material: float = 1.0
+    material: float = 2.0
     control: float = 1.0
     state: float = 1.0
     threat:float = 1.0
