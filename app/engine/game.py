@@ -245,7 +245,7 @@ class Game:
     
     def play_bot(self):
         """Joue un coups si le tours correspond à un bot"""
-        root = Node(self.chessboard, self.chessboard.moves[-1], 1)
+        root = Node(self.chessboard, None, 1)
         best_move = root.get_best_move()
         print(best_move)
         a = self.move(self.players[self.turn], move = best_move.move)

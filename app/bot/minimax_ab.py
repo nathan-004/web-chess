@@ -31,7 +31,7 @@ class Node():
         self.depth = depth
         self.player = board.turn
 
-    def get_best_move(self, coeffs:Coefficients = Coefficients()) -> BestMove:
+    def get_best_move(self, coeffs:Coefficients = Coefficients(), alpha: float = -1.0, beta:float = 1.0) -> BestMove:
         """Retourne le coups réduisant le plus les risques"""
         # Vérifier que la profondeur maximale n'a pas été atteinte
         if self.depth <= 0:
@@ -52,8 +52,16 @@ class Node():
             new_board = deepcopy(self.board)
             new_board.move(move)
 
-            value = Node(new_board, move, self.depth - 1).get_best_move(coeffs)
+            value = Node(new_board, move, self.depth - 1).get_best_move(coeffs, alpha, beta)
             best_move = self.best_between_two(best_move, value)
+
+            if self.player == WHITE:
+                alpha = max(alpha, best_move.value)
+            else:
+                beta = min(beta, best_move.value)
+
+            if beta <= alpha:
+                break
 
         return best_move
 

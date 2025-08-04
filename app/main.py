@@ -117,7 +117,7 @@ def game_page(game_id):
     player = session.get("player")
     logger.warning(games)
 
-    valid_join = games[game_id].join(player)
+    valid_join = games[game_id].join(player, None, False)
     
     if not valid_join:
         flash(ERROR_JOIN, "error")
