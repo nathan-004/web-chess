@@ -11,10 +11,10 @@ class Coefficients(NamedTuple):
     """
     Correspond aux coefficients de chaque fonction dans la moyenne des scores
     """
-    material: float = 2.0
+    material: float = 4.0
     control: float = 1.0
-    state: float = 1.0
-    threat:float = 1.0
+    state: float = 2.0
+    threat:float = 3.0
 
 def evaluation(black_eval: float, white_eval: float) -> float:
     """
