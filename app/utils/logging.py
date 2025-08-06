@@ -58,7 +58,7 @@ def display(level):
         """
 
         @wraps(function)
-        def wrapper(cls, *args, time_counter=0):
+        def wrapper(cls, *args, time_counter=False):
             cls.messages_count[level] += 1
 
             if hasattr(cls, f"timer_{level}"):
@@ -111,7 +111,7 @@ class Logger:
     @display(ERROR)
     def error(self, *arg, time_counter=False):
         pass
-    
+
 if __name__ == "__main__":
     a = Logger()
     a.debug("test", time_counter=True)
@@ -128,4 +128,4 @@ if __name__ == "__main__":
 
     a.error("test", time_counter=True)
     sleep(1.5)
-    a.error("Message 2")
+    a.error("Message 2", time_counter=True)

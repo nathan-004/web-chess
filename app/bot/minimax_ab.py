@@ -7,6 +7,8 @@ from collections import defaultdict
 from copy import deepcopy
 from random import randint
 
+from app.utils.logging import Logger, DEBUG
+
 from app.engine.board import ChessBoard
 from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK, SpecialMove
 
@@ -15,6 +17,8 @@ from app.bot.evaluation import Coefficients, final_evaluation
 class BestMove(NamedTuple):
     move:Move
     value:float
+
+logger = Logger()
 
 class Node():
     # Contient un coups et l'échiquier
@@ -42,14 +46,18 @@ class Node():
             return BestMove(self.move, self.eval(coeffs))
 
         # Stoppe ici si la partie est finie
+        logger.debug("Vérification état de la partie", time_counter=True)
         state = self.board.get_state()
+
         if isinstance(state, Win):
             return BestMove(self.move, self.eval(coeffs))
         elif isinstance(state, Stalemate):
             return BestMove(self.move, self.eval(coeffs))
         
+        logger.debug("Fin de la vérification")
+        
         best_move = None
-
+        logger.warning(f"Itération sur {len(self.board.get_all_actions())}")
         for move in self.board.get_all_actions():
             if isinstance(move, SpecialMove):
                 move = move.king_move
@@ -71,7 +79,9 @@ class Node():
 
     def eval(self, coeffs:Coefficients):
         """Retourne un float entre -1 et 1"""
+        logger.error("Début de l'évaluation de la partie", time_counter=True)
         score = final_evaluation(self.board, coeffs)
+        logger.error(f"Fin de l'évaluation : {score}")
 
         return score
     

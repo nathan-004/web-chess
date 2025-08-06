@@ -178,7 +178,7 @@ class Game:
             "black_time": self.get_current_time(BLACK),
             "white_time": self.get_current_time(WHITE),
             "evaluation": self.get_evaluation()
-            }
+            } 
     
     def get_orientation(self, username:str) -> Optional[str]:
         """Retourne la couleur de l'utilisateur s'il est dans la partie sinon None"""
