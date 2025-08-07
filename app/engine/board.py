@@ -562,7 +562,8 @@ class ConsoleChessboard(ChessBoard):
             return False
 
         start_piece = self.board[start_move.y][start_move.x]
-        if not Position(x, y) in start_piece.get_moves(Position(start_move.x, start_move.y), self.board):
+        current_move = Move(start_piece, start_move, Position(x, y))
+        if not current_move in start_piece.get_moves(Position(start_move.x, start_move.y), self.board):
             print("non respect des mouvements des pièces")
             return False
 

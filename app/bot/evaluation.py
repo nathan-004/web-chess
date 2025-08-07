@@ -14,7 +14,7 @@ class Coefficients(NamedTuple):
     material: float = 4.0
     control: float = 1.0
     state: float = 2.0
-    threat:float = 3.0
+    threat:float = 1.0
 
 def evaluation(black_eval: float, white_eval: float) -> float:
     """
@@ -42,14 +42,14 @@ def evaluation(black_eval: float, white_eval: float) -> float:
         return eval
     return decorator
 
-@evaluation(black_eval=0.30, white_eval=0.70)
+@evaluation(black_eval=-12, white_eval=12)
 def evaluation_materielle(board:ChessBoard):
     """Retourne le rapport des valeurs de pièces blanches et des noirs"""
     white = board.get_material_value(WHITE)
     black = board.get_material_value(BLACK)
-    total = white + black
+    result = white - black
 
-    return white/total if total != 0 else 0.5
+    return result
 
 @evaluation(black_eval=0, white_eval=1)
 def control_evaluation(board:ChessBoard):

@@ -7,7 +7,7 @@ import time
 from collections import defaultdict
 
 from app.utils.constants import CHECKMATE, PAT, STALEMATE
-from app.engine.board import ChessBoard, board_to_fen
+from app.engine.board import ChessBoard, board_to_fen, ConsoleChessboard
 from app.engine.utils import WHITE, BLACK
 from app.engine.utils import Move, Position, string_to_position, position_to_string
 
@@ -67,6 +67,7 @@ class Game:
         self.messages_received = defaultdict(lambda : 0) # Sous forme {`username`: index}
 
         self.end = False
+        self.processing = False
 
     def join(self, player_username:str, color:str = None, bot:bool = False) -> bool:
         """
@@ -168,7 +169,8 @@ class Game:
         if any([state in self.END_STATES for state in board_state.split(" ")]) or self.no_time_left():
             self.end = True
         elif type(self.players[self.turn]) is Bot:
-            self.play_bot()
+            if not self.processing:
+                self.play_bot()
 
         return {
             "board": board_to_fen(self.chessboard.board), 
@@ -245,9 +247,72 @@ class Game:
     
     def play_bot(self):
         """Joue un coups si le tours correspond à un bot"""
+        if not type(self.players[self.turn]) is Bot:
+            return None
+
+        self.processing = True
         root = Node(self.chessboard, None, 1)
         best_move = root.get_best_move()
         print(root.LOG_DEPTH)
-
         a = self.move(self.players[self.turn], move = best_move.move)
+        self.processing = False
         return a
+    
+
+class ConsoleGame(Game):
+    def __init__(self):
+        super().__init__()
+        self.chessboard = ConsoleChessboard()
+
+    def play(self):
+        """Boucle principale du jeu"""
+
+        while True:
+            if not all([player != None for player in self.players.values()]):
+                print('Pas suffisament de joueurs')
+                break
+
+            self.chessboard.display()
+
+            print(self.players)
+            if type(self.players[self.turn]) is Bot:
+                move = self.play_bot()
+            else:
+                move = self.play_player()
+
+    def play_player(self) -> Move:
+        """Demande l'input à l'utilisateur puis joue le coups"""
+        start_pos = self.get_player_start_pos()
+        self.chessboard.display_moves(start_pos.x, start_pos.y)
+        end_pos = self.get_player_end_pos(start_pos)
+
+        move = Move(self.chessboard.board[start_pos.y][start_pos.x], start_pos, end_pos)
+        result = self.move(self.players[self.turn], move=move)
+
+        return result
+
+    def get_player_start_pos(self) -> Position:
+        """Demande la position de départ à l'utilisateur"""
+        valid = False
+
+        while not valid:
+            valid = input("Pièce à bouger : ")
+            valid = self.chessboard.is_valid_start_move(valid, self.turn)
+        
+        return valid
+
+    def get_player_end_pos(self, start_pos:Position) -> Position:
+        """Demande la position de départ à l'utilisateur"""
+        valid = False
+
+        while not valid:
+            valid = input("Case d'arrivée : ")
+            valid = self.chessboard.is_valid_end_move(valid, start_pos)
+        
+        return valid
+
+def main():
+    game = ConsoleGame()
+    game.join("User 1")
+    game.join("Bot 1", None, bot=True)
+    game.play()
