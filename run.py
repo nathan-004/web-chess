@@ -1,3 +1,3 @@
-from app.engine.game import main
+from app.bot.learning.pgn_parser import main
 
 main()
