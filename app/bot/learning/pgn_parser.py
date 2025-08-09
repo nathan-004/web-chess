@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import NamedTuple, Optional
+from typing import Optional
 import re
 
 PGN_FILE = "datas/lichess_elite_2025-05.pgn" # Lancement du programme depuis la racine du projet
 
 pattern = r'^(1/2|1|0)-(1/2|1|0)$'
 
-@dataclass
+@dataclass(frozen=True) # Immutable
 class StringMove():
     move:str = None
     piece:Optional[str] = None
@@ -14,6 +14,9 @@ class StringMove():
 
     def __eq__(self, value):
         value == self.move
+
+    def __repr__(self):
+        return self.move
 
 @dataclass
 class PgnGame():
@@ -99,7 +102,3 @@ def get_games():
                     line = line[:-1]
                 current_string += " ".join(line)
                 current_game.Moves = get_moves(current_string)
-
-def main():
-    for game in get_games():
-        print(game)

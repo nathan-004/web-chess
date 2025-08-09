@@ -1,3 +1,3 @@
-from app.bot.learning.pgn_parser import main
+from app.bot.learning.probability import main
 
 main()
