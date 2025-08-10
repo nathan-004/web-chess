@@ -254,10 +254,10 @@ class Game:
         root = Node(self.chessboard, None, 1)
         best_move = root.get_best_move()
         print(root.LOG_DEPTH)
+        
         a = self.move(self.players[self.turn], move = best_move.move)
         self.processing = False
         return a
-    
 
 class ConsoleGame(Game):
     def __init__(self):

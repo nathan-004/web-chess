@@ -4,8 +4,11 @@
 
 from dataclasses import dataclass
 from typing import Optional
+from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
+
+root = None
 
 class Node:
     pass
@@ -28,6 +31,7 @@ class Root(Node):
         self.childs = {}
 
 def create_probability_tree(game_limit:Optional[int] = float("inf")):
+    global root
     root = Root()
     game_count = 0
 
@@ -44,8 +48,6 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")):
             else:
                 current_node.childs[move] = ChildContainer(Node(move, current_node))
                 current_node = current_node.childs[move].move
-    
-    #print_tree(root)
 
 def print_tree(node:Node, depth:int = 0):
     """Fonction récursive permettant l'affichage des coups possibles"""
@@ -57,5 +59,23 @@ def print_tree(node:Node, depth:int = 0):
         new_node = child.move
         print_tree(new_node, depth+1)
 
+def sim_game(node:Node, depth:int = 0):
+    """Simule une partie à partir de l'aléatoire"""
+    n = random() # entre 0 et 1
+    size = len(node.childs)
+    total = 0
+    new_node = None
+
+    for child in node.childs.values():
+        total += child.repetition
+        if size * n < total:
+            print(child.move.move)
+            input("")
+            new_node = child.move
+            break
+    
+    sim_game(new_node, depth + 1)
+
 def main():
-    create_probability_tree()
+    create_probability_tree(game_limit=500)
+    sim_game(root)
