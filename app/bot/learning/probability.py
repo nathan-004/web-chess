@@ -59,8 +59,8 @@ def print_tree(node:Node, depth:int = 0):
         new_node = child.move
         print_tree(new_node, depth+1)
 
-def sim_game(node:Node, depth:int = 0):
-    """Simule une partie à partir de l'aléatoire"""
+def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
+    """Simule une partie à partir de l'aléatoire puis retourne le pgn de la partie crée"""
     n = random() # entre 0 et 1
     size = len(node.childs)
     total = 0
@@ -70,12 +70,15 @@ def sim_game(node:Node, depth:int = 0):
         total += child.repetition
         if size * n < total:
             print(child.move.move)
-            input("")
+            current_pgn += f"{depth // 2}. " if depth % 2 == 0 else ""
+            current_pgn += f"{child.move.move} "
             new_node = child.move
             break
+    else:
+        return current_pgn
     
-    sim_game(new_node, depth + 1)
+    return sim_game(new_node, depth + 1, current_pgn)
 
 def main():
     create_probability_tree(game_limit=500)
-    sim_game(root)
+    print(sim_game(root))

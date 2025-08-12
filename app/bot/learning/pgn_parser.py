@@ -63,8 +63,7 @@ def get_moves(pgn_moves: str) -> list[StringMove]:
                 piece = token[0].lower()
             else:
                 piece = "p"  # pion
-        if len(token) >= 5:
-            print(token)
+                
         moves.append(StringMove(move=token, piece=piece, special=special))
     
     return moves
