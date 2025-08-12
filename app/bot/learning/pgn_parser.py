@@ -35,7 +35,6 @@ def get_moves(pgn_moves: str) -> list[StringMove]:
     Retourne une liste de StringMove
     """
     moves = []
-    
     # On enlève les numéros de coups et résultats (1-0, 0-1, 1/2-1/2)
     tokens = re.sub(r"\d+\.", "", pgn_moves)
     tokens = re.sub(r"(1-0|0-1|1/2-1/2)", "", tokens)
@@ -64,7 +63,8 @@ def get_moves(pgn_moves: str) -> list[StringMove]:
                 piece = token[0].lower()
             else:
                 piece = "p"  # pion
-
+        if len(token) >= 5:
+            print(token)
         moves.append(StringMove(move=token, piece=piece, special=special))
     
     return moves
@@ -100,5 +100,5 @@ def get_games():
                 if re.match(pattern, line[-1]):
                     current_game.Result = line[-1]
                     line = line[:-1]
-                current_string += " ".join(line)
+                current_string += " " + " ".join(line)
                 current_game.Moves = get_moves(current_string)
