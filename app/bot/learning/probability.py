@@ -7,6 +7,7 @@ from typing import Optional
 from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
+from app.engine.board import ChessBoard
 
 root = None
 
@@ -15,25 +16,29 @@ class Node:
 
 @dataclass
 class ChildContainer:
-    move:Node
+    move:str
+    board:Node
     repetition:int = 1 # Nombre de fois où ce coups a été joué depuis la suite de coups jouées
 
 class Node:
     """Coups dans un arbre de probabilités"""
-    def __init__(self, move:StringMove, parent:Node):
-        self.move = move
+    def __init__(self, board:ChessBoard, parent:Node):
+        self.board = board
         self.parent = parent
         self.childs = {}
 
 class Root(Node):
     """Noeuds de départ"""
-    def __init__(self):
+    def __init__(self, board:ChessBoard = ChessBoard()):
         self.childs = {}
 
 def create_probability_tree(game_limit:Optional[int] = float("inf")):
     global root
     root = Root()
     game_count = 0
+    boards = {
+        # Sous forme échiquier fen : Chessboard Object
+    }
 
     for game in get_games():
         current_node = root
@@ -44,10 +49,10 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")):
         for move in game.Moves:
             if move in current_node.childs:
                 current_node.childs[move].repetition += 1
-                current_node = current_node.childs[move].move
+                current_node = current_node.childs[move].board
             else:
-                current_node.childs[move] = ChildContainer(Node(move, current_node))
-                current_node = current_node.childs[move].move
+                current_node.childs[move] = ChildContainer(move, Node(move, current_node))
+                current_node = current_node.childs[move].board
 
 def print_tree(node:Node, depth:int = 0):
     """Fonction récursive permettant l'affichage des coups possibles"""
@@ -72,7 +77,7 @@ def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
             print(child.move.move)
             current_pgn += f"{depth // 2}. " if depth % 2 == 0 else ""
             current_pgn += f"{child.move.move} "
-            new_node = child.move
+            new_node = child.board
             break
     else:
         return current_pgn
