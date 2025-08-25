@@ -110,6 +110,20 @@ class Roque(SpecialMove):
     def pos(self):
         return self.move
     
+class Promotion(SpecialMove):
+    """Stocke le pion qui contient la promotion"""
+    piece:Piece
+    start_pos:Position
+    end_pos:Position
+    new_piece:Piece = None
+
+    @property
+    def pos(self):
+        return self.end_pos
+
+    def modify_piece(self, piece_type:Optional[Piece]):
+        self.new_piece = piece_type
+    
 # ---------------------------------------------------------------------------
 # états de partie
 # ---------------------------------------------------------------------------

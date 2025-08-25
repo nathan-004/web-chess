@@ -1,4 +1,4 @@
-from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque
+from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque, Promotion
 
 class King(Piece):
     def __init__(self, color: str, initial_position: Position):
@@ -200,6 +200,7 @@ class Knight(Piece):
         return moves
 
 class Pawn(Piece):
+    NEW_PIECE_TYPE = Queen
     def __init__(self, color: str, initial_position: Position):
         super().__init__(color)
         self.symbol = '\u2659' if color != WHITE else '\u265F'
@@ -230,9 +231,33 @@ class Pawn(Piece):
                 break
         
         for incr_x in range(-1, 2, 2):
+            if 0 < pos.y + self.direction < 7:
+                new_pos = Position(pos.x + incr_x, pos.y + self.direction)
+                valid = self.is_valid_pos(pos, new_pos, board)
+                if valid == 1:
+                    moves.append(Move(self, pos, new_pos))
+
+        return moves
+    
+    def special_moves(self, pos:Position, board) -> list[Promotion]:
+        """
+        Retourne s'il y a un cas de :
+        - promotion
+        """
+        if 0 < pos.y < 7:
+            return []
+
+        new_pos = Position(pos.x, pos.y + self.direction)
+        valid = self.is_valid_pos(pos, new_pos, board)
+        moves = []
+
+        if valid == 0:
+            moves.append(new_pos)
+
+        for incr_x in range(-1, 2, 2):
             new_pos = Position(pos.x + incr_x, pos.y + self.direction)
             valid = self.is_valid_pos(pos, new_pos, board)
             if valid == 1:
-                moves.append(Move(self, pos, new_pos))
-
+                moves.append(Promotion(self, pos, new_pos, self.NEW_PIECE_TYPE))
+        
         return moves

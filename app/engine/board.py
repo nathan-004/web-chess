@@ -340,7 +340,11 @@ class ChessBoard:
             if isinstance(move, Roque):
                 board = self.get_board(move.king_move, board)
                 board = self.get_board(move.rook_move, board)
-            return board 
+            elif isinstance(move, Promotion):
+                board = self.get_board(Move(move.piece, move.start_pos, move.end_pos), board)
+                new_piece = move.new_piece(move.piece.color)
+                board[move.end_pos.y][move.end_pos.x] = new_piece
+            return board
         else:
             board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
             return board

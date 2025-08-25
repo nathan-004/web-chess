@@ -8,7 +8,7 @@ from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
 from app.engine.board import ChessBoard, ConsoleChessboard
-from app.engine.utils import Move, string_to_position, Roque
+from app.engine.utils import Move, string_to_position, Roque, Promotion
 from app.engine.pieces import *
 
 root = None
@@ -83,6 +83,9 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     move = move.replace("+", "")
     move = move.replace("#", "")
 
+    if "=" in move:
+        Pawn.NEW_PIECE_TYPE = letters_pieces[move[-1]]
+
     if move[0].islower() and move[1].islower():
         column = ord(move[0]) - ord('a')
         move = move[1:]
@@ -156,20 +159,16 @@ def main():
     create_probability_tree(game_limit=500)
     pgn = sim_game(root)
     board = ConsoleChessboard()
-    try:
-        for move in pgn.split(" "):
-            print(move)
-            if move == "":
-                break
-            if move[-1] == ".":
-                continue
-            
-            new_move = string_to_move(StringMove(move), board)
-            print(new_move)
-            board.move(new_move)
+    for move in pgn.split(" "):
+        print(move)
+        if move == "":
+            break
+        if move[-1] == ".":
+            continue
+        
+        new_move = string_to_move(StringMove(move), board)
+        print(new_move)
+        board.move(new_move)
 
-            board.display()
-    except Exception as e:
-        print(e, move)
-        print(pgn)
+        board.display()
     print(pgn)
