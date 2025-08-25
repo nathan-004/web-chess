@@ -52,6 +52,26 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     letters_pieces = {piece("", None).letter.upper(): piece for piece in PIECES}
     move = string_move.move
     
+    if move == "O-O":
+        if board.turn == WHITE:
+            y = 7
+        else:
+            y = 0
+
+        king_move = Move(King, Position(4, y), Position(6, y))
+        rook_move = Move(Rook, Position(7, y), Position(5, y))
+        return Roque(king_move, rook_move, direction=+1)
+
+    if move == "O-O-O":
+        if board.turn == WHITE:
+            y = 7
+        else:
+            y = 0
+
+        king_move = Move(King, Position(4, y), Position(2, y))
+        rook_move = Move(Rook, Position(0, y), Position(3, y))
+        return Roque(king_move, rook_move)
+
     if move[0] in letters_pieces:
         piece = move[0]
         move = move[1:]
