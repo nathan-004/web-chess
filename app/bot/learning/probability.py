@@ -7,7 +7,9 @@ from typing import Optional
 from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
-from app.engine.board import ChessBoard
+from app.engine.board import ChessBoard, ConsoleChessboard
+from app.engine.utils import Move, SpecialMove, string_to_position
+from app.engine.pieces import *
 
 root = None
 
@@ -31,6 +33,39 @@ class Root(Node):
     """Noeuds de départ"""
     def __init__(self, board:ChessBoard = ChessBoard()):
         self.childs = {}
+
+def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> Move:
+    """
+    Retourne l'objet Move depuis la chaîne de caractères
+
+    Parameters
+    ----------
+    string_move:StringMove
+        Contient le coups en string comme "e4"
+    
+    Returns
+    -------
+    Move
+        Contient la position de départ et la position d'arrivée
+    """
+    PIECES = Piece.__subclasses__()
+    letters_pieces = {piece("", None).letter.upper(): piece for piece in PIECES}
+    move = string_move.move
+    
+    if move[0] in letters_pieces:
+        piece = move[0]
+        move = move[1:]
+    else:
+        piece = "P"
+    
+    move = move.replace("x", "")
+    move = move.replace("+", "")
+    move = move.replace("#", "")
+
+    end_position = string_to_position(move[:2])
+    start_position = board.get_start_position(end_position, letters_pieces[piece])
+    
+    return Move(letters_pieces[piece], start_position, end_position)
 
 def create_probability_tree(game_limit:Optional[int] = float("inf")):
     global root
@@ -86,4 +121,18 @@ def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
 
 def main():
     create_probability_tree(game_limit=500)
-    print(sim_game(root))
+    pgn = sim_game(root)
+    board = ConsoleChessboard()
+    for move in pgn.split(" "):
+        print(move)
+        if move == "":
+            break
+        if move[0].isdigit() and move[1] == ".":
+            continue
+        
+        new_move = string_to_move(StringMove(move), board)
+        print(new_move)
+        board.move(new_move)
+
+        board.display()
+    print(pgn)

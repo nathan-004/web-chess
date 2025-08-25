@@ -298,6 +298,32 @@ class ChessBoard:
 
         return actions
     
+    def get_start_position(self, end_position:Position, piece:Piece, column:int = None, board:list[list[Optional[Piece]]] = None) -> Position:
+        """
+        Cherche la position de départ avec la position d'arrivée et la pièce
+
+        Parameters
+        ----------
+        end_position:Position
+        piece:Piece
+        column:int
+            Colone de la pièce de départ
+        """
+        if board is None:
+            board = self.board
+
+        pieces_pos = self.find_pieces(piece, color=self.turn, board=board)
+
+        if column is not None:
+            for p in pieces_pos:
+                if p.y != column:
+                    pieces_pos.remove(p)
+
+        for p in pieces_pos:
+            for move in self.get_moves(p, board):
+                if end_position == move.end_pos:
+                    return p
+
     def get_board(self, move:Move, board:Optional[list] = None) -> Optional[list]:
         """Retourne le coup réalisé sans vérification préalable"""
         if board is None:
