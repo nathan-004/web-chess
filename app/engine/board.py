@@ -316,7 +316,7 @@ class ChessBoard:
 
         if column is not None:
             for p in pieces_pos:
-                if p.y != column:
+                if p.x != column:
                     pieces_pos.remove(p)
 
         for p in pieces_pos:

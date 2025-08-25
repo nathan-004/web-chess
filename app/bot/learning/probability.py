@@ -8,7 +8,7 @@ from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
 from app.engine.board import ChessBoard, ConsoleChessboard
-from app.engine.utils import Move, SpecialMove, string_to_position
+from app.engine.utils import Move, string_to_position, Roque
 from app.engine.pieces import *
 
 root = None
@@ -60,7 +60,7 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
 
         king_move = Move(King, Position(4, y), Position(6, y))
         rook_move = Move(Rook, Position(7, y), Position(5, y))
-        return Roque(king_move, rook_move, direction=+1)
+        return king_move
 
     if move == "O-O-O":
         if board.turn == WHITE:
@@ -70,7 +70,8 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
 
         king_move = Move(King, Position(4, y), Position(2, y))
         rook_move = Move(Rook, Position(0, y), Position(3, y))
-        return Roque(king_move, rook_move)
+
+        return king_move
 
     if move[0] in letters_pieces:
         piece = move[0]
@@ -82,8 +83,16 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     move = move.replace("+", "")
     move = move.replace("#", "")
 
+    if move[0].islower() and move[1].islower():
+        column = ord(move[0]) - ord('a')
+        move = move[1:]
+    else:
+        column = None
+
+    print(column)
+
     end_position = string_to_position(move[:2])
-    start_position = board.get_start_position(end_position, letters_pieces[piece])
+    start_position = board.get_start_position(end_position, letters_pieces[piece], column=column)
     
     return Move(letters_pieces[piece], start_position, end_position)
 
@@ -143,16 +152,20 @@ def main():
     create_probability_tree(game_limit=500)
     pgn = sim_game(root)
     board = ConsoleChessboard()
-    for move in pgn.split(" "):
-        print(move)
-        if move == "":
-            break
-        if move[0].isdigit() and move[1] == ".":
-            continue
-        
-        new_move = string_to_move(StringMove(move), board)
-        print(new_move)
-        board.move(new_move)
+    try:
+        for move in pgn.split(" "):
+            print(move)
+            if move == "":
+                break
+            if move[-1] == ".":
+                continue
+            
+            new_move = string_to_move(StringMove(move), board)
+            print(new_move)
+            board.move(new_move)
 
-        board.display()
+            board.display()
+    except Exception as e:
+        print(e, move)
+        print(pgn)
     print(pgn)
