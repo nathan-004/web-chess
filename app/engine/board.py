@@ -298,7 +298,7 @@ class ChessBoard:
 
         return actions
     
-    def get_start_position(self, end_position:Position, piece:Piece, column:int = None, board:list[list[Optional[Piece]]] = None) -> Position:
+    def get_start_position(self, end_position:Position, piece:Piece, column:int = None, row:int = None, board:list[list[Optional[Piece]]] = None) -> Position:
         """
         Cherche la position de départ avec la position d'arrivée et la pièce
 
@@ -308,6 +308,7 @@ class ChessBoard:
         piece:Piece
         column:int
             Colone de la pièce de départ
+        row:int
         """
         if board is None:
             board = self.board
@@ -317,6 +318,10 @@ class ChessBoard:
         if column is not None:
             for p in pieces_pos:
                 if p.x != column:
+                    pieces_pos.remove(p)
+        if row is not None:
+            for p in pieces_pos:
+                if p.y != row:
                     pieces_pos.remove(p)
 
         for p in pieces_pos:

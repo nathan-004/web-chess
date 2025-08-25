@@ -86,13 +86,17 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     if move[0].islower() and move[1].islower():
         column = ord(move[0]) - ord('a')
         move = move[1:]
+        row = None
+    elif move[0].isdigit() and move[1].islower():
+        row = int(move[0])
+        move = move[1:]
+        column = None
     else:
         column = None
-
-    print(column)
+        row = None
 
     end_position = string_to_position(move[:2])
-    start_position = board.get_start_position(end_position, letters_pieces[piece], column=column)
+    start_position = board.get_start_position(end_position, letters_pieces[piece], column=column, row=row)
     
     return Move(letters_pieces[piece], start_position, end_position)
 
