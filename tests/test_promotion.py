@@ -1,4 +1,3 @@
-import pytest
 from app.engine.pieces import Pawn, Queen
 from app.engine.board import ChessBoard, ConsoleChessboard, blank_board
 from app.engine.utils import Position, Move

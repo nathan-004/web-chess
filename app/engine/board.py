@@ -297,7 +297,7 @@ class ChessBoard:
 
         return actions
     
-    def get_start_position(self, end_position:Position, piece:Piece, column:int = None, row:int = None, board:list[list[Optional[Piece]]] = None) -> Position:
+    def get_start_position(self, end_position:Position, piece:Piece = None, column:int = None, row:int = None, board:list[list[Optional[Piece]]] = None) -> Position:
         """
         Cherche la position de départ avec la position d'arrivée et la pièce
 
@@ -311,17 +311,28 @@ class ChessBoard:
         """
         if board is None:
             board = self.board
+        if piece is None:
+            for p in self.PIECES:
+                position = self.get_start_position(end_position, p, column, row, board)
+                if position is not None:
+                    return position
 
         pieces_pos = self.find_pieces(piece, color=self.turn, board=board)
-
+ 
         if column is not None:
+            temp = pieces_pos.copy()
             for p in pieces_pos:
                 if p.x != column:
-                    pieces_pos.remove(p)
+                    temp.remove(p)
+            pieces_pos = temp
+            print("Column", pieces_pos, column)
         if row is not None:
+            temp = pieces_pos.copy()
             for p in pieces_pos:
                 if p.y != row:
-                    pieces_pos.remove(p)
+                    temp.remove(p)
+            pieces_pos = temp
+            print("Row", pieces_pos, row)
 
         for p in pieces_pos:
             for move in self.get_moves(p, board):
@@ -466,6 +477,7 @@ class ConsoleChessboard(ChessBoard):
         moves = self.get_moves(Position(xx, yy), board)
 
         move_positions = {move.pos for move in moves}
+        print(f"Coups possibles : {moves}")
 
         for y, row in enumerate(board):
             print("")

@@ -7,7 +7,7 @@ from typing import Optional
 from random import random
 
 from app.bot.learning.pgn_parser import get_games, StringMove
-from app.engine.board import ChessBoard, ConsoleChessboard
+from app.engine.board import ChessBoard, ConsoleChessboard, blank_board
 from app.engine.utils import Move, string_to_position, Roque, Promotion
 from app.engine.pieces import *
 
@@ -91,7 +91,7 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
         move = move[1:]
         row = None
     elif move[0].isdigit() and move[1].islower():
-        row = int(move[0])
+        row = int(move[0]) - 1
         move = move[1:]
         column = None
     else:
@@ -101,6 +101,9 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     end_position = string_to_position(move[:2])
     start_position = board.get_start_position(end_position, letters_pieces[piece], column=column, row=row)
     
+    if piece == "P" and start_position is None:
+        start_position = board.get_start_position(end_position, column=column, row=row, board=board.board)
+
     return Move(letters_pieces[piece], start_position, end_position)
 
 def create_probability_tree(game_limit:Optional[int] = float("inf")):
