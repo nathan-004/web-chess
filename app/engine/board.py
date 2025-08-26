@@ -280,7 +280,6 @@ class ChessBoard:
         for move in piece.get_moves(start_pos, board):
             if isinstance(self.valid_move(move, board, turn), Move):
                 moves.append(move)
-        
         moves.extend(piece.special_moves(start_pos, self))
         return moves
     
@@ -342,7 +341,7 @@ class ChessBoard:
                 board = self.get_board(move.rook_move, board)
             elif isinstance(move, Promotion):
                 board = self.get_board(Move(move.piece, move.start_pos, move.end_pos), board)
-                new_piece = move.new_piece(move.piece.color)
+                new_piece = move.new_piece(move.piece.color, Position(move.end_pos.x, move.end_pos.y))
                 board[move.end_pos.y][move.end_pos.x] = new_piece
             return board
         else:

@@ -112,10 +112,11 @@ class Roque(SpecialMove):
     
 class Promotion(SpecialMove):
     """Stocke le pion qui contient la promotion"""
-    piece:Piece
-    start_pos:Position
-    end_pos:Position
-    new_piece:Piece = None
+
+    def __new__(cls, piece, start_pos, end_pos, new_piece_type):
+        obj = super().__new__(cls, piece, start_pos, end_pos)
+        obj.new_piece = new_piece_type
+        return obj
 
     @property
     def pos(self):

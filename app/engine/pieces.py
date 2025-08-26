@@ -221,6 +221,9 @@ class Pawn(Piece):
         moves = []
 
         for incr_y in range(1 * self.direction, 3 * self.direction if self.initial_position == pos else 2 * self.direction, 1 * self.direction):
+            if not 0 < pos.y + incr_y < 7:
+                break
+
             new_pos = Position(pos.x, pos.y + incr_y)
 
             valid = self.is_valid_pos(pos, new_pos, board)
@@ -244,19 +247,21 @@ class Pawn(Piece):
         Retourne s'il y a un cas de :
         - promotion
         """
-        if 0 < pos.y < 7:
+        super().special_moves(pos, board)
+        if 1 < pos.y < 6:
+            print("No promotion possible")
             return []
 
         new_pos = Position(pos.x, pos.y + self.direction)
-        valid = self.is_valid_pos(pos, new_pos, board)
+        valid = self.is_valid_pos(pos, new_pos, board.board)
         moves = []
 
         if valid == 0:
-            moves.append(new_pos)
+            moves.append(Promotion(self, pos, new_pos, self.NEW_PIECE_TYPE))
 
         for incr_x in range(-1, 2, 2):
             new_pos = Position(pos.x + incr_x, pos.y + self.direction)
-            valid = self.is_valid_pos(pos, new_pos, board)
+            valid = self.is_valid_pos(pos, new_pos, board.board)
             if valid == 1:
                 moves.append(Promotion(self, pos, new_pos, self.NEW_PIECE_TYPE))
         
