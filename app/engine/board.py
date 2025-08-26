@@ -325,14 +325,13 @@ class ChessBoard:
                 if p.x != column:
                     temp.remove(p)
             pieces_pos = temp
-            print("Column", pieces_pos, column)
         if row is not None:
             temp = pieces_pos.copy()
             for p in pieces_pos:
                 if p.y != row:
+                    print(p, row)
                     temp.remove(p)
             pieces_pos = temp
-            print("Row", pieces_pos, row)
 
         for p in pieces_pos:
             for move in self.get_moves(p, board):

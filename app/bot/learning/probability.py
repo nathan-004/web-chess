@@ -91,7 +91,7 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
         move = move[1:]
         row = None
     elif move[0].isdigit() and move[1].islower():
-        row = int(move[0]) - 1
+        row = 8 - int(move[0])
         move = move[1:]
         column = None
     else:
