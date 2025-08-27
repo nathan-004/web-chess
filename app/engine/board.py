@@ -103,7 +103,7 @@ class ChessBoard:
             if is_self_board:
                 logger.debug("Ajout du coups à self.moves")
                 self.moves.append(move)
-                self.turn = BLACK if self.turn == WHITE else WHITE
+                self.turn = WHITE if len(self.moves) % 2 == 0 else BLACK
         else:
             return 1
 
@@ -214,12 +214,13 @@ class ChessBoard:
         """Retourne une liste des positions des pièces qui remplissent les conditions données"""  
         if board is None:
             board = self.board
-
+        logger.debug(f"Recherche des pièces de type {piece_type.__name__} et couleur {color}")
         positions = []
         for y, row in enumerate(board):
             for x, piece in enumerate(row):
                 if type(piece) is piece_type and (piece.color == color or color is None):
                     positions.append(Position(x, y))
+        logger.info(f"Positions trouvées pour {piece_type.__name__} : {positions}")
             
         return positions
     
@@ -278,9 +279,11 @@ class ChessBoard:
         piece = board[start_pos.y][start_pos.x]
         moves = []
         for move in piece.get_moves(start_pos, board):
+            logger.debug(f"Vérification du move {move} pour {piece} en {start_pos}")
             if isinstance(self.valid_move(move, board, turn), Move):
                 moves.append(move)
         moves.extend(piece.special_moves(start_pos, self))
+        logger.debug(f"Coups possibles pour {piece} en {start_pos} : {moves}")
         return moves
     
     def get_all_actions(self, board_:Optional[list] = None) -> list[Move]:
@@ -332,9 +335,11 @@ class ChessBoard:
                     print(p, row)
                     temp.remove(p)
             pieces_pos = temp
+        logger.debug(f"Positions après filtrage : {pieces_pos}")
 
         for p in pieces_pos:
             for move in self.get_moves(p, board):
+                logger.debug(f"Vérification du move {move} contre {end_position}")
                 if end_position == move.end_pos:
                     return p
 
@@ -438,6 +443,13 @@ class ChessBoard:
                     elif target.color == color:
                         score += target.value
         return score
+    
+    def clone(self) -> 'ChessBoard':
+        """Retourne une copie de l'échiquier"""
+        new_chessboard = ChessBoard(copy.deepcopy(self.board))
+        new_chessboard.moves = copy.deepcopy(self.moves)
+        new_chessboard.turn = self.turn
+        return new_chessboard
 
 # ------------------------ Partie dans la console ------------------------
 class ConsoleChessboard(ChessBoard):

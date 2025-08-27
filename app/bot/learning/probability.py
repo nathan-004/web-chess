@@ -122,10 +122,13 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
             print(move)
             move = string_to_move(move, current_node.board)
             print(move)
-            new_board = deepcopy(current_node.board)
+            new_board = current_node.board.clone()
+            logger.error(f"ID board courant : {id(current_node.board)} / ID new_board : {id(new_board)}")
+            logger.error(f"Avant move : {len(new_board.moves)} - {new_board.turn}")
             new_board.move(move)
+            logger.error(f"Après move : {len(new_board.moves)} - {new_board.turn}")
             ConsoleChessboard(new_board.board).display()
-            fen = board_to_fen(new_board.board)
+            fen = board_to_fen(new_board.board) + " " + new_board.turn
 
             if not fen in tree.boards:
                 new_node = Node(new_board, current_node)

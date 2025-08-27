@@ -1,4 +1,9 @@
+import logging
+
 from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque, Promotion
+import app.utils.logger_config
+
+logger = logging.getLogger(app.utils.logger_config.APP_NAME)
 
 class King(Piece):
     def __init__(self, color: str, initial_position: Position):
@@ -25,7 +30,7 @@ class King(Piece):
                     continue
 
                 new_pos = Position(pos.x + incr_x, pos.y + incr_y)
-
+                logger.debug(f"Objet King : Vérification du move {new_pos} pour {self} en {pos}")
                 if self.is_valid_pos(pos, new_pos, board) <= self.VALID_LIMIT:
                     moves.append(Move(self, pos, new_pos))
 

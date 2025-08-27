@@ -126,6 +126,16 @@ class Promotion(SpecialMove):
     def modify_piece(self, piece_type:Optional[Piece]):
         self.new_piece = piece_type
     
+    def __deepcopy__(self, memo):
+        from copy import deepcopy
+        
+        return Promotion(
+            deepcopy(self.piece, memo),
+            deepcopy(self.start_pos, memo),
+            deepcopy(self.end_pos, memo),
+            deepcopy(self.new_piece, memo)
+        )
+    
 # ---------------------------------------------------------------------------
 # états de partie
 # ---------------------------------------------------------------------------
