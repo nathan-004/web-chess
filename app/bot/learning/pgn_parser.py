@@ -81,13 +81,12 @@ def get_games():
             if line == "":
                 break
             if line == "\n":
+                if current_game.is_complete():
+                    yield current_game
+                    current_game = PgnGame()
+                    current_string = ""
                 continue
             line = line[:-1] # Enlever Newline
-
-            if current_game.is_complete():
-                yield current_game
-                current_game = PgnGame()
-                current_string = ""
 
             if line.startswith("[") and line.endswith("]"):
                 content = line[1:-1].split('"')[:-1]

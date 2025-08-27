@@ -5,34 +5,34 @@
 from dataclasses import dataclass
 from typing import Optional
 from random import random
+from copy import deepcopy
 
 from app.bot.learning.pgn_parser import get_games, StringMove
-from app.engine.board import ChessBoard, ConsoleChessboard, blank_board
+from app.engine.board import ChessBoard, ConsoleChessboard, board_to_fen
 from app.engine.utils import Move, string_to_position, Roque, Promotion
 from app.engine.pieces import *
 
-root = None
-
-class Node:
-    pass
-
-@dataclass
-class ChildContainer:
-    move:str
-    board:Node
-    repetition:int = 1 # Nombre de fois où ce coups a été joué depuis la suite de coups jouées
-
 class Node:
     """Coups dans un arbre de probabilités"""
-    def __init__(self, board:ChessBoard, parent:Node):
+    def __init__(self, board:ChessBoard, parent):
         self.board = board
         self.parent = parent
         self.childs = {}
+        self.repetition:int = 1 # Nombre de fois où ce coups a été joué depuis la suite de coups jouées
 
 class Root(Node):
     """Noeuds de départ"""
     def __init__(self, board:ChessBoard = ChessBoard()):
+        self.board = board
         self.childs = {}
+        self.repetition:int = 1
+
+class Tree:
+    def __init__(self, root:Node = Root()):
+        self.root = root
+        self.boards = {
+            # Sous forme de FEN
+        }
 
 def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> Move:
     """
@@ -106,37 +106,40 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
 
     return Move(letters_pieces[piece], start_position, end_position)
 
-def create_probability_tree(game_limit:Optional[int] = float("inf")):
-    global root
-    root = Root()
+def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
+    tree = Tree()
+    tree.boards[board_to_fen(tree.root.board.board)] = tree.root
     game_count = 0
-    boards = {
-        # Sous forme échiquier fen : Chessboard Object
-    }
 
     for game in get_games():
-        current_node = root
+        current_node = tree.root
         game_count += 1
         print(game_count)
         if game_count >= game_limit:
             break
         for move in game.Moves:
+            ConsoleChessboard(current_node.board.board).display()
+            print(move)
+            move = string_to_move(move, current_node.board)
+            print(move)
+            new_board = deepcopy(current_node.board)
+            new_board.move(move)
+            ConsoleChessboard(new_board.board).display()
+            fen = board_to_fen(new_board.board)
+
+            if not fen in tree.boards:
+                new_node = Node(new_board, current_node)
+                tree.boards[fen] = new_node
+            else:
+                new_node = tree.boards[fen]
+
             if move in current_node.childs:
                 current_node.childs[move].repetition += 1
-                current_node = current_node.childs[move].board
+                current_node = new_node
             else:
-                current_node.childs[move] = ChildContainer(move, Node(move, current_node))
-                current_node = current_node.childs[move].board
-
-def print_tree(node:Node, depth:int = 0):
-    """Fonction récursive permettant l'affichage des coups possibles"""
-    indent = " " * depth
-    if not type(node) is Root:
-        print(f"{indent}{node.move} -> {node.parent.childs[node.move].repetition}")
-
-    for child in node.childs.values():
-        new_node = child.move
-        print_tree(new_node, depth+1)
+                current_node.childs[move] = new_node
+                current_node = new_node
+        
 
 def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
     """Simule une partie à partir de l'aléatoire puis retourne le pgn de la partie crée"""
@@ -159,8 +162,8 @@ def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
     return sim_game(new_node, depth + 1, current_pgn)
 
 def main():
-    create_probability_tree(game_limit=500)
-    pgn = sim_game(root)
+    tree = create_probability_tree(game_limit=1000)
+    pgn = sim_game(tree.root)
     board = ConsoleChessboard()
     for move in pgn.split(" "):
         print(move)
