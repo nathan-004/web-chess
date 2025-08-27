@@ -136,6 +136,26 @@ class Promotion(SpecialMove):
             deepcopy(self.new_piece, memo)
         )
     
+class EnPassant(SpecialMove):
+    """Stocke le pion qui capture en passant et le pion capturé"""
+    def __new__(cls, piece, start_pos:Position, end_pos:Position, captured_pawn:Position):
+        obj = super().__new__(cls, piece, start_pos, end_pos)
+        obj.captured_pawn = captured_pawn
+        return obj
+
+    @property
+    def pos(self):
+        return self.end_pos
+
+    def __deepcopy__(self, memo):
+        from copy import deepcopy
+
+        return EnPassant(
+            deepcopy(self.piece, memo),
+            deepcopy(self.start_pos, memo),
+            deepcopy(self.end_pos, memo),
+            deepcopy(self.captured_pawn, memo)
+        )
 # ---------------------------------------------------------------------------
 # états de partie
 # ---------------------------------------------------------------------------

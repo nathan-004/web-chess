@@ -1,6 +1,7 @@
 import logging
+from typing import Union, Optional
 
-from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque, Promotion
+from app.engine.utils import Position, Piece, WHITE, BLACK, Move, Roque, Promotion, EnPassant
 import app.utils.logger_config
 
 logger = logging.getLogger(app.utils.logger_config.APP_NAME)
@@ -224,15 +225,14 @@ class Pawn(Piece):
         """
         super().get_moves(pos, board)
         moves = []
-
+        print(self.initial_position, pos)
         for incr_y in range(1 * self.direction, 3 * self.direction if self.initial_position == pos else 2 * self.direction, 1 * self.direction):
             if not 0 < pos.y + incr_y < 7:
                 break
-
             new_pos = Position(pos.x, pos.y + incr_y)
 
             valid = self.is_valid_pos(pos, new_pos, board)
-            
+
             if valid == 0:
                 moves.append(Move(self, pos, new_pos))
             if valid == 1 or valid == 4:
@@ -244,22 +244,59 @@ class Pawn(Piece):
                 valid = self.is_valid_pos(pos, new_pos, board)
                 if valid == 1:
                     moves.append(Move(self, pos, new_pos))
-
         return moves
     
-    def special_moves(self, pos:Position, board) -> list[Promotion]:
+    def get_en_passant(self, pos:Position, board) -> Optional[EnPassant]:
+        """Regarde si une prise en passant est possible à une position donnée"""
+        moves = []
+        if not board.moves:
+            return None
+        
+        last_move = board.moves[-1]
+        if not isinstance(last_move.piece, Pawn):
+            return None
+        
+        if abs(last_move.start_pos.y - last_move.end_pos.y) != 2:
+            return None
+        
+        if last_move.end_pos.y != pos.y:
+            return None
+        
+        if abs(last_move.end_pos.x - pos.x) != 1:
+            return moves
+        
+        new_pos = Position(last_move.end_pos.x, last_move.end_pos.y + self.direction)
+        if self.is_valid_pos(pos, new_pos, board.board) == 0:
+            return EnPassant(
+                self,
+                pos,
+                new_pos,
+                last_move.end_pos,
+            )
+        
+        return moves
+
+    def special_moves(self, pos:Position, board) -> list[Union[Promotion, EnPassant]]:
         """
         Retourne s'il y a un cas de :
         - promotion
+        - prise en passant
         """
         super().special_moves(pos, board)
+        moves = []
+
+        for incr_x in range(-1, 2, 2):
+            if 0 < pos.y + self.direction < 7:
+                new_pos = Position(pos.x + incr_x, pos.y + self.direction)
+                move = self.get_en_passant(pos, board) 
+                if move is not None:
+                    moves.append(move)
+
         if 1 < pos.y < 6:
-            print("No promotion possible")
-            return []
+            return moves
 
         new_pos = Position(pos.x, pos.y + self.direction)
         valid = self.is_valid_pos(pos, new_pos, board.board)
-        moves = []
 
         if valid == 0:
             moves.append(Promotion(self, pos, new_pos, self.NEW_PIECE_TYPE))
