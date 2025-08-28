@@ -358,6 +358,9 @@ class ChessBoard:
                 board = self.get_board(Move(move.piece, move.start_pos, move.end_pos), board)
                 new_piece = move.new_piece(move.piece.color, Position(move.end_pos.x, move.end_pos.y))
                 board[move.end_pos.y][move.end_pos.x] = new_piece
+            elif isinstance(move, EnPassant):
+                board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
+                board[move.captured_pawn_pos.y][move.captured_pawn_pos.x] = None
             return board
         else:
             board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
