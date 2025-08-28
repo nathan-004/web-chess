@@ -111,41 +111,37 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
     tree.boards[board_to_fen(tree.root.board.board)] = tree.root
     game_count = 0
 
-    try:
-        for game in get_games():
-            current_node = tree.root
-            game_count += 1
-            print(game_count)
-            if game_count >= game_limit:
-                break
-            for move in game.Moves:
-                ConsoleChessboard(current_node.board.board).display()
-                print(move)
-                move = string_to_move(move, current_node.board)
-                print(move)
-                new_board = current_node.board.clone()
-                logger.error(f"ID board courant : {id(current_node.board)} / ID new_board : {id(new_board)}")
-                logger.error(f"Avant move : {len(new_board.moves)} - {new_board.turn}")
-                new_board.move(move)
-                logger.error(f"Après move : {len(new_board.moves)} - {new_board.turn}")
-                ConsoleChessboard(new_board.board).display()
-                fen = board_to_fen(new_board.board) + " " + new_board.turn
+    for game in get_games():
+        current_node = tree.root
+        game_count += 1
+        print(game_count)
+        if game_count >= game_limit:
+            break
+        for move in game.Moves:
+            ConsoleChessboard(current_node.board.board).display()
+            print(move)
+            move = string_to_move(move, current_node.board)
+            print(move)
+            new_board = current_node.board.clone()
+            logger.error(f"ID board courant : {id(current_node.board)} / ID new_board : {id(new_board)}")
+            logger.error(f"Avant move : {len(new_board.moves)} - {new_board.turn}")
+            new_board.move(move)
+            logger.error(f"Après move : {len(new_board.moves)} - {new_board.turn}")
+            ConsoleChessboard(new_board.board).display()
+            fen = board_to_fen(new_board.board) + " " + new_board.turn
 
-                if not fen in tree.boards:
-                    new_node = Node(new_board, current_node)
-                    tree.boards[fen] = new_node
-                else:
-                    new_node = tree.boards[fen]
+            if not fen in tree.boards:
+                new_node = Node(new_board, current_node)
+                tree.boards[fen] = new_node
+            else:
+                new_node = tree.boards[fen]
 
-                if move in current_node.childs:
-                    current_node.childs[move].repetition += 1
-                    current_node = new_node
-                else:
-                    current_node.childs[move] = new_node
-                    current_node = new_node
-    except Exception as e:
-        print(f"Erreur lors de la création de l'arbre de probabilité : {e}")
-        print(" ".join([stringmove.__repr__() for stringmove in game.Moves]))        
+            if move in current_node.childs:
+                current_node.childs[move].repetition += 1
+                current_node = new_node
+            else:
+                current_node.childs[move] = new_node
+                current_node = new_node
 
 def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
     """Simule une partie à partir de l'aléatoire puis retourne le pgn de la partie crée"""

@@ -360,7 +360,7 @@ class ChessBoard:
                 board[move.end_pos.y][move.end_pos.x] = new_piece
             elif isinstance(move, EnPassant):
                 board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
-                board[move.captured_pawn_pos.y][move.captured_pawn_pos.x] = None
+                board[move.captured_pawn.y][move.captured_pawn.x] = None
             return board
         else:
             board[move.start_pos.y][move.start_pos.x], board[move.end_pos.y][move.end_pos.x] = None, board[move.start_pos.y][move.start_pos.x]
