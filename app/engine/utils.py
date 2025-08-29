@@ -14,7 +14,6 @@ def string_to_position(position:str) -> Position:
     if not(position[0].isalpha() and position[1].isdigit()):
         return None
     
-    print(ord(position[0]) - ord('a'), 8 - int(position[1]))
     x = ord(position[0]) - ord('a')
     y = 8 - int(position[1])
 

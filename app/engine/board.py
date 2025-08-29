@@ -321,7 +321,6 @@ class ChessBoard:
                     return position
 
         pieces_pos = self.find_pieces(piece, color=self.turn, board=board)
- 
         if column is not None:
             temp = pieces_pos.copy()
             for p in pieces_pos:
@@ -332,7 +331,6 @@ class ChessBoard:
             temp = pieces_pos.copy()
             for p in pieces_pos:
                 if p.y != row:
-                    print(p, row)
                     temp.remove(p)
             pieces_pos = temp
         logger.debug(f"Positions après filtrage : {pieces_pos}")

@@ -225,7 +225,6 @@ class Pawn(Piece):
         """
         super().get_moves(pos, board)
         moves = []
-        print(self.initial_position, pos)
         for incr_y in range(1 * self.direction, 3 * self.direction if self.initial_position == pos else 2 * self.direction, 1 * self.direction):
             if not 0 < pos.y + incr_y < 7:
                 break
@@ -263,7 +262,7 @@ class Pawn(Piece):
             return None
         
         if abs(last_move.end_pos.x - pos.x) != 1:
-            return moves
+            return None
         
         new_pos = Position(last_move.end_pos.x, last_move.end_pos.y + self.direction)
         if self.is_valid_pos(pos, new_pos, board.board) == 0:
@@ -274,7 +273,7 @@ class Pawn(Piece):
                 last_move.end_pos,
             )
         
-        return moves
+        return None
 
     def special_moves(self, pos:Position, board) -> list[Union[Promotion, EnPassant]]:
         """
@@ -291,7 +290,6 @@ class Pawn(Piece):
                 move = self.get_en_passant(pos, board) 
                 if move is not None:
                     moves.append(move)
-
         if 1 < pos.y < 6:
             return moves
 
