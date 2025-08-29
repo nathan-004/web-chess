@@ -92,6 +92,17 @@ class Move(NamedTuple):
     def pos(self):
         return self.end_pos
 
+    def __eq__(self, other):
+        return (
+            isinstance(other, Move) and
+            self.piece == other.piece and
+            self.start_pos == other.start_pos and
+            self.end_pos == other.end_pos
+        )
+
+    def __hash__(self):
+        return hash((self.piece, self.start_pos, self.end_pos))
+
 class SpecialMove(Move):
     """Stocke les coups spéciaux, avec le coups et la représentation qui doit apparaître à l'échiquier"""
     

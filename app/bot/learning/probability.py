@@ -136,41 +136,8 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
             else:
                 current_node.childs[move] = new_node
                 current_node = new_node
-
-def sim_game(node:Node, depth:int = 0, current_pgn:str = ""):
-    """Simule une partie à partir de l'aléatoire puis retourne le pgn de la partie crée"""
-    n = random() # entre 0 et 1
-    size = len(node.childs)
-    total = 0
-    new_node = None
-
-    for child in node.childs.values():
-        total += child.repetition
-        if size * n < total:
-            print(child.move.move)
-            current_pgn += f"{depth // 2}. " if depth % 2 == 0 else ""
-            current_pgn += f"{child.move.move} "
-            new_node = child.board
-            break
-    else:
-        return current_pgn
     
-    return sim_game(new_node, depth + 1, current_pgn)
+    return tree
 
 def main():
-    tree = create_probability_tree(game_limit=500)
-    pgn = sim_game(tree.root)
-    board = ConsoleChessboard()
-    for move in pgn.split(" "):
-        print(move)
-        if move == "":
-            break
-        if move[-1] == ".":
-            continue
-        
-        new_move = string_to_move(StringMove(move), board)
-        print(new_move)
-        board.move(new_move)
-
-        board.display()
-    print(pgn)
+    tree = create_probability_tree(game_limit=50)
