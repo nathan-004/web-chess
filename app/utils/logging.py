@@ -114,6 +114,7 @@ class Logger:
 
 if __name__ == "__main__":
     a = Logger()
+    a.error("test", time_counter=True)
     a.debug("test", time_counter=True)
     sleep(1.5)
     a.debug("Message 2")
@@ -126,6 +127,6 @@ if __name__ == "__main__":
     sleep(1.5)
     a.warning("Message 2")
 
-    a.error("test", time_counter=True)
+    a.error("test", time_counter=False)
     sleep(1.5)
     a.error("Message 2", time_counter=True)

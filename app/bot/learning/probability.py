@@ -2,15 +2,13 @@
 # Calcule la probabilité de coups à partir des données
 #----------------------------------------------------------------------
 
-from dataclasses import dataclass
 from typing import Optional
-from random import random
-from copy import deepcopy
 
 from app.bot.learning.pgn_parser import get_games, StringMove
 from app.engine.board import ChessBoard, ConsoleChessboard, board_to_fen
 from app.engine.utils import Move, string_to_position, Roque, Promotion
 from app.engine.pieces import *
+from app.utils.logging import Logger
 
 class Node:
     """Coups dans un arbre de probabilités"""
@@ -107,20 +105,29 @@ def string_to_move(string_move:StringMove, board:ChessBoard = ChessBoard()) -> M
     return Move(letters_pieces[piece], start_position, end_position)
 
 def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
+    logger = Logger()
+    logger.debug("Création de l'arbre de probabilité...", time_counter=True)
     tree = Tree()
     tree.boards[board_to_fen(tree.root.board.board)] = tree.root
     game_count = 0
+    logger.debug("Arbre initialisé")
 
     for game in get_games():
         current_node = tree.root
         game_count += 1
-        print(game_count)
+        logger.error(f"Analyse de la partie {game_count}...", time_counter=True)
         if game_count >= game_limit:
             break
         for move in game.Moves:
+            logger.warning("Début de la gestion du coup", time_counter=True)
+            logger.info(f"Début transformation du coup", time_counter=True)
             move = string_to_move(move, current_node.board)
+            logger.info(f"Coup transformé en {move}", time_counter=False)
+
+            logger.info(f"Application du coup", time_counter=True)
             new_board = current_node.board.clone()
             new_board.move(move)
+            logger.info(f"Coup appliqué", time_counter=False)
             #ConsoleChessboard(new_board.board).display()
             fen = board_to_fen(new_board.board) + " " + new_board.turn
 
@@ -136,6 +143,8 @@ def create_probability_tree(game_limit:Optional[int] = float("inf")) -> Tree:
             else:
                 current_node.childs[move] = new_node
                 current_node = new_node
+            logger.warning("Coup géré", time_counter=False)
+        logger.error(f"Partie {game_count} analysée", time_counter=False)
     
     return tree
 
