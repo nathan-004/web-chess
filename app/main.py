@@ -5,7 +5,6 @@ from collections import defaultdict
 import uuid
 import logging
 
-import app.utils.logger_config # Initialise le logger
 from app.engine.game import Game
 from app.engine.board import board_to_fen
 from app.engine.utils import string_to_position, position_to_string, Move
@@ -15,7 +14,7 @@ from app.utils.constants import *
 ID_GAME_SIZE = 8
 MIN_USERNAME_SIZE = 4
 
-logger = logging.getLogger(app.utils.logger_config.APP_NAME)
+logger = logging.getLogger(APP_NAME)
 app = Flask(__name__)
 app.secret_key = '5QuF6Rq9GQ'
 
@@ -117,7 +116,7 @@ def game_page(game_id):
     player = session.get("player")
     logger.warning(games)
 
-    valid_join = games[game_id].join(player, None, False)
+    valid_join = games[game_id].join(player, None, True)
     
     if not valid_join:
         flash(ERROR_JOIN, "error")
@@ -202,4 +201,4 @@ def get_turn():
     return jsonify({"turn": games[id].turn})
 
 def main():
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="localhost", debug=True)

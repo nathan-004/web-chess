@@ -1,4 +1,5 @@
 from typing import NamedTuple
+import random
 
 from app.engine.board import ChessBoard
 from app.engine.utils import WHITE, BLACK, Win, Check
@@ -11,10 +12,10 @@ class Coefficients(NamedTuple):
     """
     Correspond aux coefficients de chaque fonction dans la moyenne des scores
     """
-    material: float = 4.0
-    control: float = 1.0
-    state: float = 2.0
-    threat:float = 1.0
+    material: float = random.uniform(0.5, 5)
+    control: float = random.uniform(0.5, 5)
+    state: float = random.uniform(0.5, 5)
+    threat:float = random.uniform(0.5, 5)
 
 def evaluation(black_eval: float, white_eval: float) -> float:
     """

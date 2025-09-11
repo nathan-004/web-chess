@@ -10,7 +10,7 @@ from random import randint
 from app.utils.logging import Logger, DEBUG
 
 from app.engine.board import ChessBoard
-from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK, SpecialMove
+from app.engine.utils import Move, Win, Stalemate, WHITE, BLACK, SpecialMove, Roque, Promotion
 
 from app.bot.evaluation import Coefficients, final_evaluation
 
@@ -59,7 +59,7 @@ class Node():
         best_move = None
         logger.warning(f"Itération sur {len(self.board.get_all_actions())}")
         for move in self.board.get_all_actions():
-            if isinstance(move, SpecialMove):
+            if isinstance(move, Roque):
                 move = move.king_move
             new_board = deepcopy(self.board)
             new_board.move(move)
